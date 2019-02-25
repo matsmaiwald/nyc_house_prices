@@ -58,19 +58,42 @@ df = df.drop_duplicates(df.columns)
 sum(df["sale_price"].isnull())
 df = df[df["sale_price"].notnull()]
 
+list(df.columns.values)
 
+# Name vars to keep
+vars_num = ["residential_units",
+            "commercial_units",
+            "land_square_feet",
+            "gross_square_feet",
+            "sale_price",
+            "age_at_sale"
+            ]
 
-# TO DO: consider which variables to keep and do one hot feature encoding
+vars_one_hot_full = ["neighborhood",
+                     "building_class_category",
+                     "zip_code",
+                     "tax_class_at_time_of_sale",
+                     "borough_name",
+                     "sale_year",
+                     "sale_month"
+                     ]
 
-column_model=['BOROUGH','BUILDING CLASS CATEGORY','COMMERCIAL UNITS','GROSS SQUARE FEET',
-               'SALE PRICE','Building Age During Sale','LAND SQUARE FEET','RESIDENTIAL UNITS','seasons']
-data_model=data.loc[:,column_model]
+vars_one_hot_simple = ["tax_class_at_time_of_sale",
+                       "borough_name",
+                       "sale_year"
+                       ]
+
+vars_one_hot = vars_one_hot_simple
+
+vars_to_keep = vars_num + vars_one_hot
 
 # Convert categorical variables into dummy/indicator variables (i.e. one-hot encoding).
-one_hot_encoded = pd.get_dummies(data_model[one_hot_features])
+one_hot_encoded = pd.get_dummies(df[vars_one_hot])
 one_hot_encoded.info(verbose=True, memory_usage=True, null_counts=True)
 
 #Drop original categorical features and keep one hot encoded feature
-data_model.drop(one_hot_features,axis=1,inplace=True)
-data_model=pd.concat([data_model,one_hot_encoded],axis=1)
-data_model.head()
+df_temp = df[vars_to_keep]
+
+df_temp.drop(vars_one_hot,axis=1,inplace=True)
+df_clean = pd.concat([df_temp, one_hot_encoded], axis=1)
+df_clean.head()
