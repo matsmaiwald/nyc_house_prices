@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import sklearn as sk
 
 name_df_input = "nyc-rolling-sales.csv"
 df = pd.read_csv(name_df_input)
@@ -97,3 +98,14 @@ df_temp = df[vars_to_keep]
 df_temp.drop(vars_one_hot,axis=1,inplace=True)
 df_clean = pd.concat([df_temp, one_hot_encoded], axis=1)
 df_clean.head()
+
+
+X = df_clean.drop(columns=["sale_price"])
+y = df_clean["sale_price"]
+# train-test split ------------------------------------------------------------
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, 
+                                                    y, 
+                                                    test_size=0.2, 
+                                                    random_state=42
+                                                    )
