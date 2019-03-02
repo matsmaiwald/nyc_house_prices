@@ -1,10 +1,14 @@
 import numpy as np
 import pandas as pd
 import sklearn as sk
+import matplotlib.pyplot as plt
+from sklearn import model_selection
+import seaborn as sns
 
 name_df_input = "nyc-rolling-sales.csv"
 df = pd.read_csv(name_df_input)
 
+# TO DO: first look at data
 df.head()
 df.columns = map(str.lower, df.columns)
 df.columns = map(lambda s: s.replace(" ", "_"), df.columns)
@@ -34,7 +38,7 @@ df.info()
 for col_name in ["sale_price", "land_square_feet", "gross_square_feet"]:
     df[col_name] = pd.to_numeric(df[col_name], errors = "coerce")
 
-df["sale_price"] = pd.to_numeric(df["sale_price"], errors='coerce')
+df["selling_price"] = pd.to_numeric(df["sale_price"], errors='coerce') # rename
 df["sale_date"] = pd.to_datetime(df["sale_date"])
 df["sale_year"] = df["sale_date"].dt.year
 df["sale_month"] = df["sale_date"].dt.month
@@ -55,18 +59,27 @@ sum(df.duplicated(df.columns))
 df = df.drop_duplicates(df.columns)
 
 
-# Remove observations with missing SALE PRICE
-sum(df["sale_price"].isnull())
-df = df[df["sale_price"].notnull()]
+# Remove observations with missing sales price or year built
+sum(df["selling_price"].isnull())
+df = df[df["selling_price"].notnull()]
+
+sum(df["selling_price"] == 0)
+df = df[df["selling_price"] > 10]
+
+sum(df["year_built"] < 1500)
+df = df[df["year_built"] > 1500]
+
+sum(~(df['land_square_feet'] > 0))
+df = df[df["land_square_feet"] > 0]
 
 list(df.columns.values)
 
 # Name vars to keep
 vars_num = ["residential_units",
             "commercial_units",
-            "land_square_feet",
-            "gross_square_feet",
-            "sale_price",
+            "land_square_feet",   # TO DO: include these and infer missing values
+            #"gross_square_feet",
+            "selling_price",
             "age_at_sale"
             ]
 
@@ -97,15 +110,114 @@ df_temp = df[vars_to_keep]
 
 df_temp.drop(vars_one_hot,axis=1,inplace=True)
 df_clean = pd.concat([df_temp, one_hot_encoded], axis=1)
-df_clean.head()
+del df_temp
+df_clean.sort_values(by=['selling_price'], inplace=True)
+df_clean.reset_index(drop=True, inplace=True)
+df_clean_summary = df_clean.describe()
+
+# TO DO: include summary statistics and plots of y var
+selling_price_pct_95 = np.percentile(df_clean['selling_price'], 95)
+plt.style.use('seaborn')
+
+fig, ax = plt.subplots(1,2)
+
+ax[0].hist(df_clean[df_clean['selling_price'] < selling_price_pct_95]['selling_price'], bins = 100)
+ax[0].set_title("Distribution of bottom 95% of selling prices")
+ax[0].set_xlabel("Selling price in $")
+ax[0].set_ylabel("Frequency")
+ax[1].hist(df_clean['selling_price'].apply(np.log), bins = 100)
+ax[1].set_title("Distribution of log-transformed selling prices")
+ax[1].set_xlabel("Log(selling price) in $")
+ax[1].set_ylabel("Frequency")
+fig.suptitle("Sales prices are approximately log-normally distributed", size=16)
 
 
-X = df_clean.drop(columns=["sale_price"])
-y = df_clean["sale_price"]
+fig, ax = plt.subplots(5)
+
+ax[0].hist(df_clean[df_clean['borough_name_Bronx'] == 1]['selling_price'].apply(np.log), bins = 100)
+ax[0].set_title("Bronx")
+ax[0].set_xlabel("Log(selling price) in $")
+ax[0].set_ylabel("Frequency")
+ax[0].set_xlim(2,20)
+
+ax[1].hist(df_clean[df_clean['borough_name_Brooklyn'] == 1]['selling_price'].apply(np.log), bins = 100)
+ax[1].set_title("Brooklyn")
+ax[1].set_xlabel("Log(selling price) in $")
+ax[1].set_ylabel("Frequency")
+ax[1].set_xlim(2,20)
+
+ax[2].hist(df_clean[df_clean['borough_name_Manhattan'] == 1]['selling_price'].apply(np.log), bins = 100)
+ax[2].set_title("Manhattan")
+ax[2].set_xlabel("Log(selling price) in $")
+ax[2].set_ylabel("Frequency")
+ax[2].set_xlim(2,20)
+
+ax[3].hist(df_clean[df_clean['borough_name_Queens'] == 1]['selling_price'].apply(np.log), bins = 100)
+ax[3].set_title("Queens")
+ax[3].set_xlabel("Log(selling price) in $")
+ax[3].set_ylabel("Frequency")
+ax[3].set_xlim(2,20)
+
+ax[4].hist(df_clean[df_clean['borough_name_Staten Island'] == 1]['selling_price'].apply(np.log), bins = 100)
+ax[4].set_title("Staten Island")
+ax[4].set_xlabel("Log(selling price) in $")
+ax[4].set_ylabel("Frequency")
+ax[4].set_xlim(2,20)
+
+
+
+ax[5].hist(df_clean['selling_price'].apply(np.log), bins = 100)
+ax[5].set_title("Distribution of log-transformed selling prices")
+ax[5].set_xlabel("Log(selling price) in $")
+ax[5].set_ylabel("Frequency")
+
+fig.suptitle("Sales prices are approximately log-normally distributed", size=16)
+
+
+
+
+
+
+X = df_clean.drop(columns=["selling_price"])
+y = df_clean["selling_price"]
+
 # train-test split ------------------------------------------------------------
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import ElasticNet
+# prepare configuration for cross validation test harness
+random_seed = 42
+
 X_train, X_test, y_train, y_test = train_test_split(X, 
                                                     y, 
                                                     test_size=0.2, 
-                                                    random_state=42
+                                                    random_state=random_seed
                                                     )
+
+
+# TO DO: include parameters for lasso and ridge
+
+# prepare models
+models = []
+models.append(('OLS', LinearRegression()))
+models.append(('Lasso', ElasticNet()))
+
+# evaluate each model in turn
+results = []
+names = []
+scoring = 'neg_mean_absolute_error'
+for name, model in models:
+	kfold = model_selection.KFold(n_splits=5, random_state=random_seed)
+	cv_results = model_selection.cross_val_score(model, X_train, y_train, 
+                                              cv=kfold, scoring=scoring)
+	results.append(cv_results)
+	names.append(name)
+	msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
+	print(msg)
+# boxplot algorithm comparison
+fig = plt.figure()
+fig.suptitle('Algorithm Comparison')
+ax = fig.add_subplot(111)
+plt.boxplot(results)
+ax.set_xticklabels(names)
+plt.show()
