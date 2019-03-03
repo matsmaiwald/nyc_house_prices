@@ -113,66 +113,50 @@ df_clean = pd.concat([df_temp, one_hot_encoded], axis=1)
 del df_temp
 df_clean.sort_values(by=['selling_price'], inplace=True)
 df_clean.reset_index(drop=True, inplace=True)
+
+# Summary stats
 df_clean_summary = df_clean.describe()
 
-# TO DO: include summary statistics and plots of y var
+# Plotting distribution of Selling prices
 selling_price_pct_95 = np.percentile(df_clean['selling_price'], 95)
 plt.style.use('seaborn')
 
 fig, ax = plt.subplots(1,2)
-
-ax[0].hist(df_clean[df_clean['selling_price'] < selling_price_pct_95]['selling_price'], bins = 100)
-ax[0].set_title("Distribution of bottom 95% of selling prices")
-ax[0].set_xlabel("Selling price in $")
-ax[0].set_ylabel("Frequency")
+ax[0].hist(
+        df_clean[df_clean['selling_price'] < selling_price_pct_95]['selling_price'], 
+        bins = 100)
+ax[0].set(
+        title='Distribution of bottom 95% of selling prices', 
+        xlabel='Selling price in $', 
+        ylabel='Frequency'
+        )
 ax[1].hist(df_clean['selling_price'].apply(np.log), bins = 100)
-ax[1].set_title("Distribution of log-transformed selling prices")
-ax[1].set_xlabel("Log(selling price) in $")
-ax[1].set_ylabel("Frequency")
+ax[1].set(
+        title='Distribution of log-transformed selling price',
+        xlabel='Log(selling price) in $',
+        ylabel='Frequency'
+        )
 fig.suptitle("Sales prices are approximately log-normally distributed", size=16)
+
+
 
 
 fig, ax = plt.subplots(5)
-
-ax[0].hist(df_clean[df_clean['borough_name_Bronx'] == 1]['selling_price'].apply(np.log), bins = 100)
-ax[0].set_title("Bronx")
-ax[0].set_xlabel("Log(selling price) in $")
-ax[0].set_ylabel("Frequency")
-ax[0].set_xlim(2,20)
-
-ax[1].hist(df_clean[df_clean['borough_name_Brooklyn'] == 1]['selling_price'].apply(np.log), bins = 100)
-ax[1].set_title("Brooklyn")
-ax[1].set_xlabel("Log(selling price) in $")
-ax[1].set_ylabel("Frequency")
-ax[1].set_xlim(2,20)
-
-ax[2].hist(df_clean[df_clean['borough_name_Manhattan'] == 1]['selling_price'].apply(np.log), bins = 100)
-ax[2].set_title("Manhattan")
-ax[2].set_xlabel("Log(selling price) in $")
-ax[2].set_ylabel("Frequency")
-ax[2].set_xlim(2,20)
-
-ax[3].hist(df_clean[df_clean['borough_name_Queens'] == 1]['selling_price'].apply(np.log), bins = 100)
-ax[3].set_title("Queens")
-ax[3].set_xlabel("Log(selling price) in $")
-ax[3].set_ylabel("Frequency")
-ax[3].set_xlim(2,20)
-
-ax[4].hist(df_clean[df_clean['borough_name_Staten Island'] == 1]['selling_price'].apply(np.log), bins = 100)
-ax[4].set_title("Staten Island")
-ax[4].set_xlabel("Log(selling price) in $")
-ax[4].set_ylabel("Frequency")
-ax[4].set_xlim(2,20)
-
-
-
-ax[5].hist(df_clean['selling_price'].apply(np.log), bins = 100)
-ax[5].set_title("Distribution of log-transformed selling prices")
-ax[5].set_xlabel("Log(selling price) in $")
-ax[5].set_ylabel("Frequency")
-
-fig.suptitle("Sales prices are approximately log-normally distributed", size=16)
-
+fig.suptitle("Selling prices vary across boroughs and are highest in Manhattan", 
+             size=16)
+for i in range(0,5):
+    print(borough_map[i+1])
+    ax[i].hist(
+            df_clean[df_clean[
+                    'borough_name_' + borough_map[i+1]
+                    ] == 1]['selling_price'].apply(np.log), 
+            bins = 100)
+    ax[i].set(
+            title=borough_map[i+1],
+            xlabel="Log(selling price) in $",
+            ylabel='Frequency',
+            xlim=(10,20)
+            )
 
 
 
