@@ -158,18 +158,18 @@ for i in range(0,5):
             xlim=(10,20)
             )
 
-
-
-
-
 X = df_clean.drop(columns=["selling_price"])
 y = df_clean["selling_price"]
 
 # train-test split ------------------------------------------------------------
 from sklearn.model_selection import train_test_split
+from sklearn import model_selection
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import ElasticNet
-# prepare configuration for cross validation test harness
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import r2_score
+from sklearn.metrics import mean_absolute_error
+
 random_seed = 42
 
 X_train, X_test, y_train, y_test = train_test_split(X, 
@@ -179,21 +179,61 @@ X_train, X_test, y_train, y_test = train_test_split(X,
                                                     )
 
 
-# TO DO: include parameters for lasso and ridge
 
-# prepare models
+# Tune models------------------------------------------------------------------
 models = []
-models.append(('OLS', LinearRegression()))
-models.append(('Lasso', ElasticNet()))
+models.append(('ELN', ElasticNet(normalize=True, tol=0.1)))
 
+
+scoring = 'neg_mean_absolute_error'
+# Set the parameters by cross-validation
+tuned_parameters = [{'l1_ratio': [1], 'alpha': [1e-1, 1e-2, 1e-3, 1e-4]},
+                    {'l1_ratio': [0], 'alpha': [1e-1, 1e-2, 1e-3, 1e-4]}
+                    ]
+
+for name, model in models:
+    print("# Tuning hyper-parameters for %s" % name)
+    print()
+
+    clf = GridSearchCV(model, tuned_parameters, cv=3,
+                       scoring=scoring)
+    clf.fit(X_train, y_train)
+
+    print("Best parameters set found on development set:")
+    print()
+    print(clf.best_params_)
+    print()
+    print("Grid scores on development set:")
+    print()
+    means = clf.cv_results_['mean_test_score']
+    stds = clf.cv_results_['std_test_score']
+    for mean, std, params in zip(means, stds, clf.cv_results_['params']):
+        print("%0.3f (+/-%0.03f) for %r"
+              % (mean, std * 2, params))
+    print()
+
+    print("Detailed classification report:")
+    print()
+    print("The model is trained on the full development set.")
+    print("The scores are computed on the full evaluation set.")
+    print()
+    y_true, y_pred = y_test, clf.predict(X_test)
+    print(r2_score(y_true, y_pred))
+    print(mean_absolute_error(y_true, y_pred))
+    print()
+
+
+# Comparing CV Results---------------------------------------------------------
+models = []
+models.append(('ELN', ElasticNet()))
+models.append(('OLS', LinearRegression()))
 # evaluate each model in turn
 results = []
 names = []
-scoring = 'neg_mean_absolute_error'
+
 for name, model in models:
-	kfold = model_selection.KFold(n_splits=5, random_state=random_seed)
-	cv_results = model_selection.cross_val_score(model, X_train, y_train, 
-                                              cv=kfold, scoring=scoring)
+	kfold = model_selection.KFold(n_splits=10, random_state=random_seed)
+	cv_results = model_selection.cross_val_score(model, X_train, y_train, cv=kfold, scoring=scoring)
 	results.append(cv_results)
 	names.append(name)
 	msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
