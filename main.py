@@ -166,6 +166,7 @@ from sklearn.model_selection import train_test_split
 from sklearn import model_selection
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import ElasticNet
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_absolute_error
@@ -182,32 +183,48 @@ X_train, X_test, y_train, y_test = train_test_split(X,
 
 # Tune models------------------------------------------------------------------
 models = []
-models.append(('ELN', ElasticNet(normalize=True, tol=0.1)))
+models.append((
+        'ELN', 
+        ElasticNet(normalize=True, tol=0.1),
+        [{'l1_ratio': [1], 'alpha': [1e-1, 1e-2, 1e-3, 1e-4]}]
+        )
+)
+
+models.append((
+        'RF', 
+         RandomForestRegressor(n_estimators = 50,
+                               max_depth = 3,
+                               random_state = random_seed),
+                               [{'max_features':[2,3]}])
+         )
 
 
 scoring = 'neg_mean_absolute_error'
 # Set the parameters by cross-validation
-tuned_parameters = [{'l1_ratio': [1], 'alpha': [1e-1, 1e-2, 1e-3, 1e-4]},
-                    {'l1_ratio': [0], 'alpha': [1e-1, 1e-2, 1e-3, 1e-4]}
-                    ]
-
-for name, model in models:
+tuning_grid = [
+        {'l1_ratio': [1], 'alpha': [1e-1, 1e-2, 1e-3, 1e-4]},
+        {'l1_ratio': [0], 'alpha': [1e-1, 1e-2, 1e-3, 1e-4]},
+        {'max_features':[2,3]}
+        ]
+tuned_models = []
+for name, model, grid in models:
     print("# Tuning hyper-parameters for %s" % name)
     print()
 
-    clf = GridSearchCV(model, tuned_parameters, cv=3,
+    model = GridSearchCV(model, grid, cv=3,
                        scoring=scoring)
-    clf.fit(X_train, y_train)
+    model.fit(X_train, y_train)
+    tuned_models.append((name, model.best_estimator_))
 
     print("Best parameters set found on development set:")
     print()
-    print(clf.best_params_)
+    print(model.best_params_)
     print()
     print("Grid scores on development set:")
     print()
-    means = clf.cv_results_['mean_test_score']
-    stds = clf.cv_results_['std_test_score']
-    for mean, std, params in zip(means, stds, clf.cv_results_['params']):
+    means = model.cv_results_['mean_test_score']
+    stds = model.cv_results_['std_test_score']
+    for mean, std, params in zip(means, stds, model.cv_results_['params']):
         print("%0.3f (+/-%0.03f) for %r"
               % (mean, std * 2, params))
     print()
@@ -217,7 +234,7 @@ for name, model in models:
     print("The model is trained on the full development set.")
     print("The scores are computed on the full evaluation set.")
     print()
-    y_true, y_pred = y_test, clf.predict(X_test)
+    y_true, y_pred = y_test, model.predict(X_test)
     print(r2_score(y_true, y_pred))
     print(mean_absolute_error(y_true, y_pred))
     print()
@@ -231,7 +248,7 @@ models.append(('OLS', LinearRegression()))
 results = []
 names = []
 
-for name, model in models:
+for name, model in tuned_models:
 	kfold = model_selection.KFold(n_splits=10, random_state=random_seed)
 	cv_results = model_selection.cross_val_score(model, X_train, y_train, cv=kfold, scoring=scoring)
 	results.append(cv_results)
