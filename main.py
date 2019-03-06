@@ -4,6 +4,7 @@ import sklearn as sk
 import matplotlib.pyplot as plt
 from sklearn import model_selection
 import seaborn as sns
+import time
 
 name_df_input = "nyc-rolling-sales.csv"
 df = pd.read_csv(name_df_input)
@@ -201,13 +202,14 @@ models.append((
 
 scoring = 'neg_mean_absolute_error'
 # Set the parameters by cross-validation
-tuning_grid = [
-        {'l1_ratio': [1], 'alpha': [1e-1, 1e-2, 1e-3, 1e-4]},
-        {'l1_ratio': [0], 'alpha': [1e-1, 1e-2, 1e-3, 1e-4]},
-        {'max_features':[2,3]}
-        ]
+#tuning_grid = [
+#        {'l1_ratio': [1], 'alpha': [1e-1, 1e-2, 1e-3, 1e-4]},
+#        {'l1_ratio': [0], 'alpha': [1e-1, 1e-2, 1e-3, 1e-4]},
+#        {'max_features':[2,3]}
+#        ]
 tuned_models = []
 for name, model, grid in models:
+    t0 = time.time()
     print("# Tuning hyper-parameters for %s" % name)
     print()
 
@@ -216,11 +218,11 @@ for name, model, grid in models:
     model.fit(X_train, y_train)
     tuned_models.append((name, model.best_estimator_))
 
-    print("Best parameters set found on development set:")
+    print("Best parameters set found on train set:")
     print()
     print(model.best_params_)
     print()
-    print("Grid scores on development set:")
+    print("Grid scores on train set:")
     print()
     means = model.cv_results_['mean_test_score']
     stds = model.cv_results_['std_test_score']
@@ -229,36 +231,29 @@ for name, model, grid in models:
               % (mean, std * 2, params))
     print()
 
-    print("Detailed classification report:")
+    print("Score on the test set:")
     print()
-    print("The model is trained on the full development set.")
-    print("The scores are computed on the full evaluation set.")
+    y_pred = model.predict(X_test)
+    print("R2 score: " + str(round(r2_score(y_test, y_pred),3)))
+    print('MAE: ' + str(round(mean_absolute_error(y_test, y_pred), 2)))
     print()
-    y_true, y_pred = y_test, model.predict(X_test)
-    print(r2_score(y_true, y_pred))
-    print(mean_absolute_error(y_true, y_pred))
-    print()
-
-
-# Comparing CV Results---------------------------------------------------------
-models = []
-models.append(('ELN', ElasticNet()))
-models.append(('OLS', LinearRegression()))
-# evaluate each model in turn
-results = []
-names = []
-
-for name, model in tuned_models:
-	kfold = model_selection.KFold(n_splits=10, random_state=random_seed)
-	cv_results = model_selection.cross_val_score(model, X_train, y_train, cv=kfold, scoring=scoring)
-	results.append(cv_results)
-	names.append(name)
-	msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
-	print(msg)
-# boxplot algorithm comparison
-fig = plt.figure()
-fig.suptitle('Algorithm Comparison')
-ax = fig.add_subplot(111)
-plt.boxplot(results)
-ax.set_xticklabels(names)
-plt.show()
+    t1 = time.time()
+    msg_time = 'Tuning the ' + name + ' model took ' + str(round(t1 - t0, 2)) + ' seconds.'
+    print(msg_time)
+    
+    
+fig, ax = plt.subplots(1,len(tuned_models))
+for i in range(len(tuned_models)):
+    y_pred = tuned_models[i][1].predict(X_test)
+    ax[i].scatter(y_test, y_pred)
+    subplot_title = "{} \n R2 score: {:.3f}, MAE: {:.0f}".format(
+            tuned_models[i][0], 
+            r2_score(y_test, y_pred), 
+            mean_absolute_error(y_test, y_pred))
+    #ax[i].get_xaxis().get_major_formatter().set_scientific(False)
+    ax[i].set(
+                title=subplot_title,
+                xlabel='Actual selling price in $',
+                ylabel='Predicted selling price in $'
+                )
+fig.suptitle("Final model comparison of prediction vs actuals", size=16)
