@@ -115,8 +115,11 @@ del df_temp
 df_clean.sort_values(by=['selling_price'], inplace=True)
 df_clean.reset_index(drop=True, inplace=True)
 
+df_clean = df_clean.astype('float64')
+
+
 # Summary stats
-df_clean_summary = df_clean.describe()
+df_clean.describe()
 
 # Plotting distribution of Selling prices
 selling_price_pct_95 = np.percentile(df_clean['selling_price'], 95)
@@ -279,4 +282,3 @@ fig.suptitle("Final model comparison of prediction vs actuals", size=16)
 # TO DO
 
 #Try out (light) xgboost
-# Get rid of warning about int
