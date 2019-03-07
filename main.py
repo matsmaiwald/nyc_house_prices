@@ -171,6 +171,9 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_absolute_error
+from sklearn.compose import TransformedTargetRegressor
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
 random_seed = 42
 
@@ -185,55 +188,70 @@ X_train, X_test, y_train, y_test = train_test_split(X,
 # Tune models------------------------------------------------------------------
 models = []
 models.append((
-        'ELN', 
+        'Lasso', 
         ElasticNet(normalize=True, tol=0.1),
-        [{'l1_ratio': [1], 'alpha': [1e-1, 1e-2, 1e-3, 1e-4]}]
+        [{'ttregressor__regressor__l1_ratio': [1], 'ttregressor__regressor__alpha': [1e-1, 1e-2, 1e-3, 1e-4]}]
+        )
+)
+
+models.append((
+        'Ridge', 
+        ElasticNet(normalize=True, tol=0.1),
+        [{'ttregressor__regressor__l1_ratio': [0], 'ttregressor__regressor__alpha': [1e-1, 1e-2, 1e-3, 1e-4]}]
         )
 )
 
 models.append((
         'RF', 
-         RandomForestRegressor(n_estimators = 50,
-                               max_depth = 3,
+         RandomForestRegressor(
                                random_state = random_seed),
-                               [{'max_features':[2,3]}])
+                               [{'ttregressor__regressor__max_features':[2,3],
+                                 "ttregressor__regressor__max_depth":[3, 9],
+                                 "ttregressor__regressor__n_estimators":[50, 500]}])
          )
 
 
 scoring = 'neg_mean_absolute_error'
-# Set the parameters by cross-validation
-#tuning_grid = [
-#        {'l1_ratio': [1], 'alpha': [1e-1, 1e-2, 1e-3, 1e-4]},
-#        {'l1_ratio': [0], 'alpha': [1e-1, 1e-2, 1e-3, 1e-4]},
-#        {'max_features':[2,3]}
-#        ]
+# https://scikit-learn.org/stable/modules/model_evaluation.html
+
 tuned_models = []
 for name, model, grid in models:
+    my_pipeline = sk.pipeline.Pipeline([
+             ('scale', StandardScaler()),
+             ('ttregressor', 
+              TransformedTargetRegressor(
+                      regressor=model,
+                      func=np.log,
+                      inverse_func=np.exp
+                      )
+              )
+              ])
     t0 = time.time()
     print("# Tuning hyper-parameters for %s" % name)
     print()
-
-    model = GridSearchCV(model, grid, cv=3,
+    current_model = GridSearchCV(my_pipeline, grid, cv=3,
                        scoring=scoring)
-    model.fit(X_train, y_train)
-    tuned_models.append((name, model.best_estimator_))
+    
+
+    current_model.fit(X_train, y_train)
+    tuned_models.append((name, current_model.best_estimator_))
 
     print("Best parameters set found on train set:")
     print()
-    print(model.best_params_)
+    print(current_model.best_params_)
     print()
     print("Grid scores on train set:")
     print()
-    means = model.cv_results_['mean_test_score']
-    stds = model.cv_results_['std_test_score']
-    for mean, std, params in zip(means, stds, model.cv_results_['params']):
+    means = current_model.cv_results_['mean_test_score']
+    stds = current_model.cv_results_['std_test_score']
+    for mean, std, params in zip(means, stds, current_model.cv_results_['params']):
         print("%0.3f (+/-%0.03f) for %r"
               % (mean, std * 2, params))
     print()
 
     print("Score on the test set:")
     print()
-    y_pred = model.predict(X_test)
+    y_pred = current_model.predict(X_test)
     print("R2 score: " + str(round(r2_score(y_test, y_pred),3)))
     print('MAE: ' + str(round(mean_absolute_error(y_test, y_pred), 2)))
     print()
@@ -257,3 +275,8 @@ for i in range(len(tuned_models)):
                 ylabel='Predicted selling price in $'
                 )
 fig.suptitle("Final model comparison of prediction vs actuals", size=16)
+
+# TO DO
+
+#Try out (light) xgboost
+# Get rid of warning about int
