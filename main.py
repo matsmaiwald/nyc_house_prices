@@ -167,16 +167,51 @@ y = df_clean["selling_price"]
 
 # train-test split ------------------------------------------------------------
 from sklearn.model_selection import train_test_split
-from sklearn import model_selection
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import ElasticNet
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import median_absolute_error
 from sklearn.compose import TransformedTargetRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+
+def mean_absolute_percentage_error(y_true, y_pred,
+                        sample_weight=None):
+    """Mean absolute percentage error regression loss
+    
+    ----------
+    y_true : array-like of shape = (n_samples) or (n_samples, n_outputs)
+        Ground truth (correct) target values.
+    y_pred : array-like of shape = (n_samples) or (n_samples, n_outputs)
+        Estimated target values.
+    sample_weight : array-like of shape = (n_samples), optional
+        Sample weights."""
+   
+
+    output_errors = np.average(np.abs(y_pred / y_true -1),
+                               weights=sample_weight, axis=0)
+
+    return(output_errors)
+    
+    
+def median_absolute_percentage_error(y_true, y_pred):
+    """Median absolute percentage error regression loss
+    
+    ----------
+    y_true : array-like of shape = (n_samples) or (n_samples, n_outputs)
+        Ground truth (correct) target values.
+    y_pred : array-like of shape = (n_samples) or (n_samples, n_outputs)
+        Estimated target values.
+    sample_weight : array-like of shape = (n_samples), optional
+        Sample weights."""
+   
+
+    output_errors = np.median(np.abs(y_pred / y_true -1), axis=0)
+
+    return(output_errors)
 
 random_seed = 42
 
@@ -267,10 +302,12 @@ fig, ax = plt.subplots(1,len(tuned_models))
 for i in range(len(tuned_models)):
     y_pred = tuned_models[i][1].predict(X_test)
     ax[i].scatter(y_test, y_pred)
-    subplot_title = "{} \n R2 score: {:.3f}, MAE: {:.0f}".format(
+    subplot_title = "{} \n Median AE: {:.0f}, MAE: {:.0f}, \n Median APE: {:.3f}, MAPE: {:.3f}".format(
             tuned_models[i][0], 
-            r2_score(y_test, y_pred), 
-            mean_absolute_error(y_test, y_pred))
+            median_absolute_error(y_test, y_pred), 
+            mean_absolute_error(y_test, y_pred),
+            median_absolute_percentage_error(y_test,y_pred),
+            mean_absolute_percentage_error(y_test, y_pred))
     #ax[i].get_xaxis().get_major_formatter().set_scientific(False)
     ax[i].set(
                 title=subplot_title,
@@ -282,3 +319,4 @@ fig.suptitle("Final model comparison of prediction vs actuals", size=16)
 # TO DO
 
 #Try out (light) xgboost
+# Impute missing data
