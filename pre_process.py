@@ -88,10 +88,6 @@ df = df[df["land_square_feet"] > 0]
 logging.info(msg)
 
 
-# -----------------------------------------------------------------------------------
-
-list(df.columns.values)
-
 # Name vars to keep
 vars_num = ["residential_units",
             "commercial_units",
@@ -115,30 +111,35 @@ vars_one_hot_simple = ["tax_class_at_time_of_sale",
                        "sale_year"
                        ]
 
+# TO DO: include full set or a larger subset
 vars_one_hot = vars_one_hot_simple
 
 vars_to_keep = vars_num + vars_one_hot
 
 # Convert categorical variables into dummy/indicator variables (i.e. one-hot encoding).
 one_hot_encoded = pd.get_dummies(df[vars_one_hot])
-one_hot_encoded.info(verbose=True, memory_usage=True, null_counts=True)
+#one_hot_encoded.info(verbose=True, memory_usage=True, null_counts=True)
 
-#Drop original categorical features and keep one hot encoded feature
+#Drop original categorical features and keep one hot encoded dummies
 df_temp = df[vars_to_keep]
 
 df_temp.drop(vars_one_hot,axis=1,inplace=True)
 df_clean = pd.concat([df_temp, one_hot_encoded], axis=1)
 del df_temp
+
+# index by selling price
 df_clean.sort_values(by=['selling_price'], inplace=True)
 df_clean.reset_index(drop=True, inplace=True)
 
+# Recast dummies from int to float format since some algos require all floats
 df_clean = df_clean.astype('float64')
 
 
 # Summary stats
-df_clean.describe()
+df_clean.apply(lambda x: logging.info(x.describe()), axis=0)
 
-# Plotting distribution of Selling prices
+
+# Plotting distributions of Selling prices
 selling_price_pct_95 = np.percentile(df_clean['selling_price'], 95)
 plt.style.use('seaborn')
 
@@ -157,8 +158,9 @@ ax[1].set(
         xlabel='Log(selling price) in $',
         ylabel='Frequency'
         )
-fig.suptitle("Sales prices are approximately log-normally distributed", size=16)
-
+fig.suptitle("Selling prices are approximately log-normally distributed", size=16)
+fig.savefig("selling_prices_dist_log.png")
+plt.close(fig)
 
 
 
@@ -166,10 +168,9 @@ fig, ax = plt.subplots(5)
 fig.suptitle("Selling prices vary across boroughs and are highest in Manhattan",
              size=16)
 for i in range(0,5):
-    print(borough_map[i+1])
     ax[i].hist(
             df_clean[df_clean[
-                    'borough_name_' + borough_map[i+1]
+                    'borough_name_' + borough_map[i+1] # borough map starts at 1
                     ] == 1]['selling_price'].apply(np.log),
             bins = 100)
     ax[i].set(
@@ -178,3 +179,5 @@ for i in range(0,5):
             ylabel='Frequency',
             xlim=(10,20)
             )
+    fig.savefig("selling_prices_dist_boroughs.png")
+    plt.close(fig)
