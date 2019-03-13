@@ -7,4 +7,4 @@ TO DO
 
 The full code is located in the [Link to main.py file](main.py) file.
 
-![Results](https://github.com/matsmaiwald/nyc_house_prices/blob/master/figures/model_selection_comparison.PNG)
+![Results](/figures/model_selection_comparison.PNG)
