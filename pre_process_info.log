@@ -1,0 +1,149 @@
+root - INFO - There are 765 duplicated rows which will be dropped.
+root - INFO - 14176 rows without selling price info were dropped.
+root - INFO - 10891 rows with a selling price of $10 or below were dropped.
+root - INFO - 4206 rows with a construction date before 1500 were dropped.
+root - INFO - 25732 rows with a size of zero square feet were dropped.
+root - INFO - count    28778.000000
+mean         3.021336
+std         20.054042
+min          0.000000
+25%          1.000000
+50%          2.000000
+75%          2.000000
+max       1844.000000
+Name: residential_units, dtype: float64
+root - INFO - count    28778.000000
+mean         0.313469
+std         13.914324
+min          0.000000
+25%          0.000000
+50%          0.000000
+75%          0.000000
+max       2261.000000
+Name: commercial_units, dtype: float64
+root - INFO - count    2.877800e+04
+mean     4.140722e+03
+std      3.660142e+04
+min      1.680000e+02
+25%      2.000000e+03
+50%      2.500000e+03
+75%      4.000000e+03
+max      4.228300e+06
+Name: land_square_feet, dtype: float64
+root - INFO - count    2.877800e+04
+mean     1.681409e+06
+std      1.715932e+07
+min      1.900000e+01
+25%      4.320000e+05
+50%      6.300000e+05
+75%      9.680000e+05
+max      2.210000e+09
+Name: selling_price, dtype: float64
+root - INFO - count    28778.000000
+mean        75.678991
+std         30.836378
+min          0.000000
+25%         57.000000
+50%         86.000000
+75%         97.000000
+max        217.000000
+Name: age_at_sale, dtype: float64
+root - INFO - count    28778.000000
+mean         0.870144
+std          0.336151
+min          0.000000
+25%          1.000000
+50%          1.000000
+75%          1.000000
+max          1.000000
+Name: tax_class_at_time_of_sale_1, dtype: float64
+root - INFO - count    28778.000000
+mean         0.080478
+std          0.272037
+min          0.000000
+25%          0.000000
+50%          0.000000
+75%          0.000000
+max          1.000000
+Name: tax_class_at_time_of_sale_2, dtype: float64
+root - INFO - count    28778.0
+mean         0.0
+std          0.0
+min          0.0
+25%          0.0
+50%          0.0
+75%          0.0
+max          0.0
+Name: tax_class_at_time_of_sale_3, dtype: float64
+root - INFO - count    28778.000000
+mean         0.049378
+std          0.216660
+min          0.000000
+25%          0.000000
+50%          0.000000
+75%          0.000000
+max          1.000000
+Name: tax_class_at_time_of_sale_4, dtype: float64
+root - INFO - count    28778.000000
+mean         0.120057
+std          0.325034
+min          0.000000
+25%          0.000000
+50%          0.000000
+75%          0.000000
+max          1.000000
+Name: borough_name_Bronx, dtype: float64
+root - INFO - count    28778.000000
+mean         0.293801
+std          0.455510
+min          0.000000
+25%          0.000000
+50%          0.000000
+75%          1.000000
+max          1.000000
+Name: borough_name_Brooklyn, dtype: float64
+root - INFO - count    28778.000000
+mean         0.032525
+std          0.177392
+min          0.000000
+25%          0.000000
+50%          0.000000
+75%          0.000000
+max          1.000000
+Name: borough_name_Manhattan, dtype: float64
+root - INFO - count    28778.000000
+mean         0.377893
+std          0.484869
+min          0.000000
+25%          0.000000
+50%          0.000000
+75%          1.000000
+max          1.000000
+Name: borough_name_Queens, dtype: float64
+root - INFO - count    28778.000000
+mean         0.175725
+std          0.380592
+min          0.000000
+25%          0.000000
+50%          0.000000
+75%          0.000000
+max          1.000000
+Name: borough_name_Staten Island, dtype: float64
+root - INFO - count    28778.000000
+mean         0.353847
+std          0.478171
+min          0.000000
+25%          0.000000
+50%          0.000000
+75%          1.000000
+max          1.000000
+Name: sale_year_2016, dtype: float64
+root - INFO - count    28778.000000
+mean         0.646153
+std          0.478171
+min          0.000000
+25%          0.000000
+50%          1.000000
+75%          1.000000
+max          1.000000
+Name: sale_year_2017, dtype: float64

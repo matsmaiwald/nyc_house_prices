@@ -1,0 +1,40 @@
+root - INFO - # Tuning hyper-parameters for Lasso
+root - INFO - Best parameters set found on train set:
+root - INFO - {'ttregressor__regressor__alpha': 0.001, 'ttregressor__regressor__l1_ratio': 1}
+root - INFO - Grid scores on train set:
+root - INFO - -1340678.876 (+/-502294.313) for {'ttregressor__regressor__alpha': 0.1, 'ttregressor__regressor__l1_ratio': 1}
+root - INFO - -1340678.876 (+/-502294.313) for {'ttregressor__regressor__alpha': 0.01, 'ttregressor__regressor__l1_ratio': 1}
+root - INFO - -1261951.723 (+/-498319.296) for {'ttregressor__regressor__alpha': 0.001, 'ttregressor__regressor__l1_ratio': 1}
+root - INFO - -244121790786.545 (+/-690473613438.526) for {'ttregressor__regressor__alpha': 0.0001, 'ttregressor__regressor__l1_ratio': 1}
+root - INFO - Score on the test set:
+root - INFO - R2 score: 0.036
+root - INFO - MAE: 939541.33
+root - INFO - Tuning the Lasso model took 0.41 seconds.
+root - INFO - # Tuning hyper-parameters for Ridge
+root - INFO - Best parameters set found on train set:
+root - INFO - {'ttregressor__regressor__alpha': 0.001, 'ttregressor__regressor__l1_ratio': 0}
+root - INFO - Grid scores on train set:
+root - INFO - -1340502.851 (+/-502299.458) for {'ttregressor__regressor__alpha': 0.1, 'ttregressor__regressor__l1_ratio': 0}
+root - INFO - -1338941.984 (+/-502346.034) for {'ttregressor__regressor__alpha': 0.01, 'ttregressor__regressor__l1_ratio': 0}
+root - INFO - -1326172.706 (+/-500948.769) for {'ttregressor__regressor__alpha': 0.001, 'ttregressor__regressor__l1_ratio': 0}
+root - INFO - -313528797.683 (+/-882518880.252) for {'ttregressor__regressor__alpha': 0.0001, 'ttregressor__regressor__l1_ratio': 0}
+root - INFO - Score on the test set:
+root - INFO - R2 score: -0.013
+root - INFO - MAE: 995322.68
+root - INFO - Tuning the Ridge model took 4.13 seconds.
+root - INFO - # Tuning hyper-parameters for RF
+root - INFO - Best parameters set found on train set:
+root - INFO - {'ttregressor__regressor__max_depth': 9, 'ttregressor__regressor__max_features': 3, 'ttregressor__regressor__n_estimators': 50}
+root - INFO - Grid scores on train set:
+root - INFO - -1245284.798 (+/-503348.851) for {'ttregressor__regressor__max_depth': 3, 'ttregressor__regressor__max_features': 2, 'ttregressor__regressor__n_estimators': 50}
+root - INFO - -1238169.703 (+/-502103.913) for {'ttregressor__regressor__max_depth': 3, 'ttregressor__regressor__max_features': 2, 'ttregressor__regressor__n_estimators': 500}
+root - INFO - -1223333.076 (+/-499315.125) for {'ttregressor__regressor__max_depth': 3, 'ttregressor__regressor__max_features': 3, 'ttregressor__regressor__n_estimators': 50}
+root - INFO - -1221643.052 (+/-501669.053) for {'ttregressor__regressor__max_depth': 3, 'ttregressor__regressor__max_features': 3, 'ttregressor__regressor__n_estimators': 500}
+root - INFO - -1107860.456 (+/-491667.401) for {'ttregressor__regressor__max_depth': 9, 'ttregressor__regressor__max_features': 2, 'ttregressor__regressor__n_estimators': 50}
+root - INFO - -1108166.975 (+/-490946.450) for {'ttregressor__regressor__max_depth': 9, 'ttregressor__regressor__max_features': 2, 'ttregressor__regressor__n_estimators': 500}
+root - INFO - -1095144.018 (+/-480589.368) for {'ttregressor__regressor__max_depth': 9, 'ttregressor__regressor__max_features': 3, 'ttregressor__regressor__n_estimators': 50}
+root - INFO - -1096320.406 (+/-481647.070) for {'ttregressor__regressor__max_depth': 9, 'ttregressor__regressor__max_features': 3, 'ttregressor__regressor__n_estimators': 500}
+root - INFO - Score on the test set:
+root - INFO - R2 score: 0.318
+root - INFO - MAE: 767111.98
+root - INFO - Tuning the RF model took 35.46 seconds.

@@ -2,7 +2,9 @@
 
 TO DO
 
-1.  Split code into Pre-processing and main model
-2.  Think about how to deal with outliers
+1.  Think about how to deal with outliers
+2. Include more features and potentially do feature selection
 
-The output of the notebook can be found in the [Results.md](Results.md) file. The full code is located in the [main.py](main.py) file.
+The full code is located in the [Link to main.py file](main.py) file.
+
+![Results](https://github.com/matsmaiwald/nyc_house_prices/blob/master/figures/model_selection_comparison.PNG)
