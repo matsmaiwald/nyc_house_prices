@@ -307,7 +307,8 @@ for i in range(len(tuned_models)):
             median_absolute_error(y_test, y_pred), 
             mean_absolute_error(y_test, y_pred),
             median_absolute_percentage_error(y_test,y_pred),
-            mean_absolute_percentage_error(y_test, y_pred))
+            mean_absolute_percentage_error(y_test, y_pred)
+            )
     #ax[i].get_xaxis().get_major_formatter().set_scientific(False)
     ax[i].set(
                 title=subplot_title,

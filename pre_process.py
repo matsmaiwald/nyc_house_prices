@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import time
 import logging
 
 logging.basicConfig(
@@ -134,10 +133,11 @@ df_clean.reset_index(drop=True, inplace=True)
 # Recast dummies from int to float format since some algos require all floats
 df_clean = df_clean.astype('float64')
 
-
 # Summary stats
 df_clean.apply(lambda x: logging.info(x.describe()), axis=0)
 
+# Export pre processed dataset
+df_clean.to_csv('./output/data_clean.csv', index=False)
 
 # Plotting distributions of Selling prices
 selling_price_pct_95 = np.percentile(df_clean['selling_price'], 95)
