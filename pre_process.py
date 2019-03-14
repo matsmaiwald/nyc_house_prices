@@ -159,7 +159,9 @@ ax[1].set(
         ylabel='Frequency'
         )
 fig.suptitle("Selling prices are approximately log-normally distributed", size=16)
-fig.savefig("./figures/selling_prices_dist_log.png")
+#fig.tight_layout()
+fig.subplots_adjust(top=0.85)
+fig.savefig("./figures/selling_prices_dist_log.png", dpi = 1000)
 plt.close(fig)
 
 
@@ -179,5 +181,7 @@ for i in range(0,5):
             ylabel='Frequency',
             xlim=(10,20)
             )
-    fig.savefig("./figures/selling_prices_dist_boroughs.png")
+    #fig.tight_layout()
+    fig.subplots_adjust(top=0.85)
+    fig.savefig("./figures/selling_prices_dist_boroughs.png", dpi = 1000)
     plt.close(fig)

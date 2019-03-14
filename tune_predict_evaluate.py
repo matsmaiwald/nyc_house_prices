@@ -10,6 +10,8 @@ import sklearn as sk
 import time
 import logging
 import matplotlib.pyplot as plt
+import matplotlib.lines as mlines
+import matplotlib.transforms as mtransforms
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import ElasticNet
@@ -35,7 +37,7 @@ logging.basicConfig(
 def mean_absolute_percentage_error(y_true, y_pred,
                         sample_weight=None):
     """Mean absolute percentage error regression loss
-    
+
     ----------
     y_true : array-like of shape = (n_samples) or (n_samples, n_outputs)
         Ground truth (correct) target values.
@@ -43,17 +45,17 @@ def mean_absolute_percentage_error(y_true, y_pred,
         Estimated target values.
     sample_weight : array-like of shape = (n_samples), optional
         Sample weights."""
-   
+
 
     output_errors = np.average(np.abs(y_pred / y_true -1),
                                weights=sample_weight, axis=0)
 
     return(output_errors)
-    
-    
+
+
 def median_absolute_percentage_error(y_true, y_pred):
     """Median absolute percentage error regression loss
-    
+
     ----------
     y_true : array-like of shape = (n_samples) or (n_samples, n_outputs)
         Ground truth (correct) target values.
@@ -61,7 +63,7 @@ def median_absolute_percentage_error(y_true, y_pred):
         Estimated target values.
     sample_weight : array-like of shape = (n_samples), optional
         Sample weights."""
-   
+
 
     output_errors = np.median(np.abs(y_pred / y_true -1), axis=0)
 
@@ -74,9 +76,9 @@ df_clean = pd.read_csv('./output/data_clean.csv')
 X = df_clean.drop(columns=["selling_price"])
 y = df_clean["selling_price"]
 
-X_train, X_test, y_train, y_test = train_test_split(X, 
-                                                    y, 
-                                                    test_size=0.2, 
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    y,
+                                                    test_size=0.2,
                                                     random_state=random_seed
                                                     )
 
@@ -85,23 +87,23 @@ scoring = 'neg_mean_absolute_error'
 
 models = []
 models.append((
-        'Lasso', 
+        'Lasso',
         ElasticNet(normalize=True, tol=0.1),
-        [{'ttregressor__regressor__l1_ratio': [1], 
+        [{'ttregressor__regressor__l1_ratio': [1],
           'ttregressor__regressor__alpha': [1e-1, 1e-2, 1e-3, 1e-4]}]
         )
 )
 
 models.append((
-        'Ridge', 
+        'Ridge',
         ElasticNet(normalize=True, tol=0.1),
-        [{'ttregressor__regressor__l1_ratio': [0], 
+        [{'ttregressor__regressor__l1_ratio': [0],
           'ttregressor__regressor__alpha': [1e-1, 1e-2, 1e-3, 1e-4]}]
         )
 )
 
 models.append((
-        'RF', 
+        'RF',
          RandomForestRegressor(
                                random_state = random_seed),
                                [{'ttregressor__regressor__max_features':[2,3],
@@ -114,7 +116,7 @@ tuned_models = []
 for name, model, grid in models:
     my_pipeline = sk.pipeline.Pipeline([
              ('scale', StandardScaler()),
-             ('ttregressor', 
+             ('ttregressor',
               TransformedTargetRegressor(
                       regressor=model,
                       func=np.log,
@@ -128,7 +130,7 @@ for name, model, grid in models:
     print()
     current_model = GridSearchCV(my_pipeline, grid, cv=3,
                        scoring=scoring)
-    
+
 
     current_model.fit(X_train, y_train)
     tuned_models.append((name, current_model.best_estimator_))
@@ -152,28 +154,36 @@ for name, model, grid in models:
     t1 = time.time()
     msg_time = 'Tuning the ' + name + ' model took ' + str(round(t1 - t0, 2)) + ' seconds.'
     logging.info(msg_time)
-    
-    
-fig, ax = plt.subplots(1,len(tuned_models))
+
+#fig, ax = plt.subplots(1,2)
+#for i in range(2):
+
 for i in range(len(tuned_models)):
+    fig, ax = plt.subplots()
     y_pred = tuned_models[i][1].predict(X_test)
-    ax[i].scatter(y_test, y_pred)
+    ax.scatter(y_test, y_pred, alpha=0.1)
+    line = mlines.Line2D([0, 1], [0, 1], color='red')
+    transform = ax.transAxes
+    line.set_transform(transform)
+    ax.add_line(line)
     subplot_title = "{} \n Median AE: {:.0f}, MAE: {:.0f}, \n Median APE: {:.3f}, MAPE: {:.3f}".format(
-            tuned_models[i][0], 
-            median_absolute_error(y_test, y_pred), 
+            tuned_models[i][0],
+            median_absolute_error(y_test, y_pred),
             mean_absolute_error(y_test, y_pred),
             median_absolute_percentage_error(y_test,y_pred),
             mean_absolute_percentage_error(y_test, y_pred)
             )
     #ax[i].get_xaxis().get_major_formatter().set_scientific(False)
-    ax[i].set(
-                title=subplot_title,
-                xlabel='Actual selling price in $',
-                ylabel='Predicted selling price in $'
-                )
-fig.suptitle("Final model comparison of prediction vs actuals", size=16)
-fig.savefig("./figures/model_performance_comparison.png")
-plt.close(fig)
+    ax.set(title=subplot_title,
+           xlabel='Actual selling price in $',
+           ylabel='Predicted selling price in $',
+           #xlim=(0, max(y_pred.max(), y_test.max())),
+           #ylim=(0, max(y_pred.max(), y_test.max()))
+           xlim=(0, y_pred.max()*1.1),
+           ylim=(0, y_pred.max()*1.1)
+    )
+    fig.savefig("./figures/model_performance" + tuned_models[i][0] + ".png", dpi=1000)
+    plt.close(fig)
 
 # TO DO
 
