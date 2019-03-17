@@ -18,11 +18,11 @@ Using a 80-20 train-test split, I train different models on the training set, tu
 ## Main results
 So far, the best results are attained by Gradient Boosting, with an Median absolute error of $119k and a median percentage error of 18% given a median selling price of $630k.
 
+![Results](/figures/model_performance_lgbm.png)
+
 ## To do
 
 * Extract and generated better features
 * Improve the tuning grids
 
 The full code is located in the [Link to main.py file](main.py) file.
-
-![Results](/figures/model_performance_comparison.png)
