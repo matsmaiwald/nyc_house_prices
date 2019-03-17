@@ -134,7 +134,7 @@ models.append((
         'RF',
          RandomForestRegressor(
                                random_state = random_seed),
-                               [{'ttregressor__regressor__max_features':[2,3],
+                               [{'ttregressor__regressor__max_features':[2,5,15,25],
                                  "ttregressor__regressor__max_depth":[3, 9],
                                  "ttregressor__regressor__n_estimators":[50, 500]}])
          )

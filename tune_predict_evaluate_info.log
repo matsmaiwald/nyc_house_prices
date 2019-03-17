@@ -1,40 +1,53 @@
-root - INFO - # Tuning hyper-parameters for Lasso
+root - INFO - # Tuning hyper-parameters for Lasso---------------------
 root - INFO - Best parameters set found on train set:
 root - INFO - {'ttregressor__regressor__alpha': 0.001, 'ttregressor__regressor__l1_ratio': 1}
 root - INFO - Grid scores on train set:
 root - INFO - -1340678.876 (+/-502294.313) for {'ttregressor__regressor__alpha': 0.1, 'ttregressor__regressor__l1_ratio': 1}
 root - INFO - -1340678.876 (+/-502294.313) for {'ttregressor__regressor__alpha': 0.01, 'ttregressor__regressor__l1_ratio': 1}
-root - INFO - -1261951.723 (+/-498319.296) for {'ttregressor__regressor__alpha': 0.001, 'ttregressor__regressor__l1_ratio': 1}
-root - INFO - -244121790786.545 (+/-690473613438.526) for {'ttregressor__regressor__alpha': 0.0001, 'ttregressor__regressor__l1_ratio': 1}
+root - INFO - -1282943.724 (+/-500485.761) for {'ttregressor__regressor__alpha': 0.001, 'ttregressor__regressor__l1_ratio': 1}
+root - INFO - -2694229605.088 (+/-7616020870.902) for {'ttregressor__regressor__alpha': 0.0001, 'ttregressor__regressor__l1_ratio': 1}
 root - INFO - Score on the test set:
-root - INFO - R2 score: 0.036
-root - INFO - MAE: 939541.33
-root - INFO - Tuning the Lasso model took 0.41 seconds.
-root - INFO - # Tuning hyper-parameters for Ridge
+root - INFO - R2 score: 0.016
+root - INFO - MAE: 958422.72
+root - INFO - Tuning the Lasso model took 4.7 seconds.
+root - INFO - # Tuning hyper-parameters for Ridge---------------------
 root - INFO - Best parameters set found on train set:
 root - INFO - {'ttregressor__regressor__alpha': 0.001, 'ttregressor__regressor__l1_ratio': 0}
 root - INFO - Grid scores on train set:
-root - INFO - -1340502.851 (+/-502299.458) for {'ttregressor__regressor__alpha': 0.1, 'ttregressor__regressor__l1_ratio': 0}
-root - INFO - -1338941.984 (+/-502346.034) for {'ttregressor__regressor__alpha': 0.01, 'ttregressor__regressor__l1_ratio': 0}
-root - INFO - -1326172.706 (+/-500948.769) for {'ttregressor__regressor__alpha': 0.001, 'ttregressor__regressor__l1_ratio': 0}
-root - INFO - -313528797.683 (+/-882518880.252) for {'ttregressor__regressor__alpha': 0.0001, 'ttregressor__regressor__l1_ratio': 0}
+root - INFO - -1340342.702 (+/-502293.730) for {'ttregressor__regressor__alpha': 0.1, 'ttregressor__regressor__l1_ratio': 0}
+root - INFO - -1337367.773 (+/-502286.731) for {'ttregressor__regressor__alpha': 0.01, 'ttregressor__regressor__l1_ratio': 0}
+root - INFO - -1312422.050 (+/-500147.038) for {'ttregressor__regressor__alpha': 0.001, 'ttregressor__regressor__l1_ratio': 0}
+root - INFO - -35728473.009 (+/-97327017.482) for {'ttregressor__regressor__alpha': 0.0001, 'ttregressor__regressor__l1_ratio': 0}
 root - INFO - Score on the test set:
-root - INFO - R2 score: -0.013
-root - INFO - MAE: 995322.68
-root - INFO - Tuning the Ridge model took 4.13 seconds.
-root - INFO - # Tuning hyper-parameters for RF
+root - INFO - R2 score: -0.01
+root - INFO - MAE: 985651.78
+root - INFO - Tuning the Ridge model took 102.8 seconds.
+root - INFO - # Tuning hyper-parameters for RF---------------------
 root - INFO - Best parameters set found on train set:
-root - INFO - {'ttregressor__regressor__max_depth': 9, 'ttregressor__regressor__max_features': 3, 'ttregressor__regressor__n_estimators': 50}
+root - INFO - {'ttregressor__regressor__max_depth': 9, 'ttregressor__regressor__max_features': 25, 'ttregressor__regressor__n_estimators': 50}
 root - INFO - Grid scores on train set:
-root - INFO - -1245284.798 (+/-503348.851) for {'ttregressor__regressor__max_depth': 3, 'ttregressor__regressor__max_features': 2, 'ttregressor__regressor__n_estimators': 50}
-root - INFO - -1238169.703 (+/-502103.913) for {'ttregressor__regressor__max_depth': 3, 'ttregressor__regressor__max_features': 2, 'ttregressor__regressor__n_estimators': 500}
-root - INFO - -1223333.076 (+/-499315.125) for {'ttregressor__regressor__max_depth': 3, 'ttregressor__regressor__max_features': 3, 'ttregressor__regressor__n_estimators': 50}
-root - INFO - -1221643.052 (+/-501669.053) for {'ttregressor__regressor__max_depth': 3, 'ttregressor__regressor__max_features': 3, 'ttregressor__regressor__n_estimators': 500}
-root - INFO - -1107860.456 (+/-491667.401) for {'ttregressor__regressor__max_depth': 9, 'ttregressor__regressor__max_features': 2, 'ttregressor__regressor__n_estimators': 50}
-root - INFO - -1108166.975 (+/-490946.450) for {'ttregressor__regressor__max_depth': 9, 'ttregressor__regressor__max_features': 2, 'ttregressor__regressor__n_estimators': 500}
-root - INFO - -1095144.018 (+/-480589.368) for {'ttregressor__regressor__max_depth': 9, 'ttregressor__regressor__max_features': 3, 'ttregressor__regressor__n_estimators': 50}
-root - INFO - -1096320.406 (+/-481647.070) for {'ttregressor__regressor__max_depth': 9, 'ttregressor__regressor__max_features': 3, 'ttregressor__regressor__n_estimators': 500}
+root - INFO - -1330275.204 (+/-502434.738) for {'ttregressor__regressor__max_depth': 3, 'ttregressor__regressor__max_features': 2, 'ttregressor__regressor__n_estimators': 50}
+root - INFO - -1330444.221 (+/-502061.220) for {'ttregressor__regressor__max_depth': 3, 'ttregressor__regressor__max_features': 2, 'ttregressor__regressor__n_estimators': 500}
+root - INFO - -1317001.911 (+/-502868.707) for {'ttregressor__regressor__max_depth': 3, 'ttregressor__regressor__max_features': 5, 'ttregressor__regressor__n_estimators': 50}
+root - INFO - -1319675.550 (+/-502061.721) for {'ttregressor__regressor__max_depth': 3, 'ttregressor__regressor__max_features': 5, 'ttregressor__regressor__n_estimators': 500}
+root - INFO - -1291913.654 (+/-501320.101) for {'ttregressor__regressor__max_depth': 3, 'ttregressor__regressor__max_features': 15, 'ttregressor__regressor__n_estimators': 50}
+root - INFO - -1295163.575 (+/-499873.966) for {'ttregressor__regressor__max_depth': 3, 'ttregressor__regressor__max_features': 15, 'ttregressor__regressor__n_estimators': 500}
+root - INFO - -1277664.121 (+/-502279.741) for {'ttregressor__regressor__max_depth': 3, 'ttregressor__regressor__max_features': 25, 'ttregressor__regressor__n_estimators': 50}
+root - INFO - -1275984.170 (+/-502317.949) for {'ttregressor__regressor__max_depth': 3, 'ttregressor__regressor__max_features': 25, 'ttregressor__regressor__n_estimators': 500}
+root - INFO - -1311033.296 (+/-503256.875) for {'ttregressor__regressor__max_depth': 9, 'ttregressor__regressor__max_features': 2, 'ttregressor__regressor__n_estimators': 50}
+root - INFO - -1309876.409 (+/-501016.150) for {'ttregressor__regressor__max_depth': 9, 'ttregressor__regressor__max_features': 2, 'ttregressor__regressor__n_estimators': 500}
+root - INFO - -1274531.633 (+/-502238.026) for {'ttregressor__regressor__max_depth': 9, 'ttregressor__regressor__max_features': 5, 'ttregressor__regressor__n_estimators': 50}
+root - INFO - -1280373.112 (+/-501139.710) for {'ttregressor__regressor__max_depth': 9, 'ttregressor__regressor__max_features': 5, 'ttregressor__regressor__n_estimators': 500}
+root - INFO - -1220478.073 (+/-489713.330) for {'ttregressor__regressor__max_depth': 9, 'ttregressor__regressor__max_features': 15, 'ttregressor__regressor__n_estimators': 50}
+root - INFO - -1220354.642 (+/-496238.410) for {'ttregressor__regressor__max_depth': 9, 'ttregressor__regressor__max_features': 15, 'ttregressor__regressor__n_estimators': 500}
+root - INFO - -1181425.885 (+/-494020.010) for {'ttregressor__regressor__max_depth': 9, 'ttregressor__regressor__max_features': 25, 'ttregressor__regressor__n_estimators': 50}
+root - INFO - -1184318.659 (+/-494045.527) for {'ttregressor__regressor__max_depth': 9, 'ttregressor__regressor__max_features': 25, 'ttregressor__regressor__n_estimators': 500}
 root - INFO - Score on the test set:
-root - INFO - R2 score: 0.318
-root - INFO - MAE: 767111.98
-root - INFO - Tuning the RF model took 35.46 seconds.
+root - INFO - R2 score: 0.133
+root - INFO - MAE: 858963.14
+root - INFO - Tuning the RF model took 117.51 seconds.
+root - INFO - # Tuning hyper-parameters for LGBM-----------------------------
+root - INFO - Tuning the Light GBM model took 14.86 seconds.
+root - INFO - Score on the test set:
+root - INFO - R2 score: 0.431
+root - INFO - MAE: 649579.52

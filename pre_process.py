@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import logging
+from sklearn.preprocessing import Imputer
 
 logging.basicConfig(
     filename='pre_process_info.log',
@@ -61,7 +62,7 @@ logging.info(msg)
 df = df.drop_duplicates(df.columns)
 
 
-# Remove observations with missing sales price or year built
+# Remove observations with non-sensical data values
 msg = '{:.0f} rows without selling price info were dropped.'.format(
         sum(df["selling_price"].isnull())
         )
@@ -86,6 +87,7 @@ msg = '{:.0f} rows with a size of zero square feet were dropped.'.format(
 df = df[df["land_square_feet"] > 0]
 logging.info(msg)
 
+df.isna().sum()
 
 # Name vars to keep
 vars_num = ["residential_units",
@@ -98,9 +100,9 @@ vars_num = ["residential_units",
 
 vars_one_hot_full = ["neighborhood",
                      "building_class_category",
-                     "zip_code",
+                     #"zip_code",
                      "tax_class_at_time_of_sale",
-                     "borough_name",
+                     #"borough_name",
                      "sale_year",
                      "sale_month"
                      ]
@@ -111,7 +113,7 @@ vars_one_hot_simple = ["tax_class_at_time_of_sale",
                        ]
 
 # TO DO: include full set or a larger subset
-vars_one_hot = vars_one_hot_simple
+vars_one_hot = vars_one_hot_full
 
 vars_to_keep = vars_num + vars_one_hot
 
