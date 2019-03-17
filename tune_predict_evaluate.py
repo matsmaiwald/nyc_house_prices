@@ -22,6 +22,7 @@ from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import median_absolute_error
 from sklearn.compose import TransformedTargetRegressor
 from sklearn.pipeline import Pipeline
+from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 import lightgbm as lgb
 
@@ -70,6 +71,33 @@ def median_absolute_percentage_error(y_true, y_pred):
 
     return(output_errors)
 
+
+def plot_model_performance(y_pred, y_test, model_name):
+    """Save a scatter plot of the predicted vs actuals."""
+
+    fig, ax = plt.subplots()
+
+    ax.scatter(y_test, y_pred, alpha=0.1)
+    line = mlines.Line2D([0, 1], [0, 1], color='red')
+    transform = ax.transAxes
+    line.set_transform(transform)
+    ax.add_line(line)
+    subplot_title = "{} \n Median AE: {:.0f}, MAE: {:.0f}, \n Median APE: {:.3f}, MAPE: {:.3f}".format(
+                model_name,
+                median_absolute_error(y_test, y_pred),
+                mean_absolute_error(y_test, y_pred),
+                median_absolute_percentage_error(y_test, y_pred),
+                mean_absolute_percentage_error(y_test, y_pred))
+        #ax[i].get_xaxis().get_major_formatter().set_scientific(False)
+    ax.set(title=subplot_title,
+           xlabel='Actual selling price in $',
+           ylabel='Predicted selling price in $',
+           xlim=(0, y_pred.max()*1.1),
+           ylim=(0, y_pred.max()*1.1)
+    )
+    fig.savefig("./figures/model_performance_" + model_name + ".png", dpi=1000)
+    plt.close(fig)
+
 # train-test split ------------------------------------------------------------
 
 df_clean = pd.read_csv('./output/data_clean.csv')
@@ -83,9 +111,8 @@ X_train, X_test, y_train, y_test = train_test_split(X,
                                                     random_state=random_seed
                                                     )
 
-# Define models----------------------------------------------------------------
+# Define models to be tuned-----------------------------------------------------
 scoring = 'neg_mean_absolute_error'
-
 models = []
 models.append((
         'Lasso',
@@ -152,43 +179,29 @@ for name, model, grid in models:
     t1 = time.time()
     msg_time = 'Tuning the ' + name + ' model took ' + str(round(t1 - t0, 2)) + ' seconds.'
     logging.info(msg_time)
+    plot_model_performance(y_pred, y_test, name)
 
-#fig, ax = plt.subplots(1,2)
-#for i in range(2):
+# Models that are not tuned----------------------------------------------------
 
-for i in range(len(tuned_models)):
-    fig, ax = plt.subplots()
-    y_pred = tuned_models[i][1].predict(X_test)
-    ax.scatter(y_test, y_pred, alpha=0.1)
-    line = mlines.Line2D([0, 1], [0, 1], color='red')
-    transform = ax.transAxes
-    line.set_transform(transform)
-    ax.add_line(line)
-    subplot_title = "{} \n Median AE: {:.0f}, MAE: {:.0f}, \n Median APE: {:.3f}, MAPE: {:.3f}".format(
-            tuned_models[i][0],
-            median_absolute_error(y_test, y_pred),
-            mean_absolute_error(y_test, y_pred),
-            median_absolute_percentage_error(y_test,y_pred),
-            mean_absolute_percentage_error(y_test, y_pred)
-            )
-    #ax[i].get_xaxis().get_major_formatter().set_scientific(False)
-    ax.set(title=subplot_title,
-           xlabel='Actual selling price in $',
-           ylabel='Predicted selling price in $',
-           #xlim=(0, max(y_pred.max(), y_test.max())),
-           #ylim=(0, max(y_pred.max(), y_test.max()))
-           xlim=(0, y_pred.max()*1.1),
-           ylim=(0, y_pred.max()*1.1)
-    )
-    fig.savefig("./figures/model_performance_" + tuned_models[i][0] + ".png", dpi=1000)
-    plt.close(fig)
+## Linear Regression
+lin_reg = Pipeline([('scaling', StandardScaler()),
+                    ('ttregressor',
+                     TransformedTargetRegressor(
+                             regressor=LinearRegression(),
+                             func=np.log,
+                             inverse_func=np.exp
+                             )
+                     )
+                     ])
+lin_reg.fit(X_train, y_train)
+y_pred = lin_reg.predict(X_test)
+plot_model_performance(y_pred, y_test, "lin_reg")
 
-# create dataset for lightgbm
+## LGBM
+# create dataset for lightgbm using log-transform for selling price
 lgb_train = lgb.Dataset(X_train, np.log(y_train))
 lgb_test = lgb.Dataset(X_test, np.log(y_test))
 
-
-# specify your configurations as a dict
 lgb_params = {
     'task': 'train',
     'objective': 'mae',
@@ -205,7 +218,7 @@ lgb_params = {
 t0 = time.time()
 # train
 print("# Tuning hyper-parameters for LGBM")
-logging.info("# Tuning hyper-parameters for LGBM------------------------------")
+logging.info("# Tuning hyper-parameters for LGBM-----------------------------")
 evals_result = {}  # to record eval results for plotting
 gbm = lgb.train(lgb_params,
                 lgb_train,
@@ -221,28 +234,7 @@ logging.info("Score on the test set:")
 logging.info("R2 score: " + str(round(r2_score(y_test, y_pred),3)))
 logging.info('MAE: ' + str(round(mean_absolute_error(y_test, y_pred), 2)))
 
-fig, ax = plt.subplots()
-
-ax.scatter(y_test, y_pred, alpha=0.1)
-line = mlines.Line2D([0, 1], [0, 1], color='red')
-transform = ax.transAxes
-line.set_transform(transform)
-ax.add_line(line)
-subplot_title = "{} \n Median AE: {:.0f}, MAE: {:.0f}, \n Median APE: {:.3f}, MAPE: {:.3f}".format(
-            "LightGBM",
-            median_absolute_error(y_test, y_pred),
-            mean_absolute_error(y_test, y_pred),
-            median_absolute_percentage_error(y_test, y_pred),
-            mean_absolute_percentage_error(y_test, y_pred))
-    #ax[i].get_xaxis().get_major_formatter().set_scientific(False)
-ax.set(title=subplot_title,
-       xlabel='Actual selling price in $',
-       ylabel='Predicted selling price in $',
-       xlim=(0, y_pred.max()*1.1),
-       ylim=(0, y_pred.max()*1.1)
-)
-fig.savefig("./figures/model_performance_lgbm.png", dpi=1000)
-plt.close(fig)
+plot_model_performance(y_pred, y_test, "lgbm")
 
 
 # TO DO
