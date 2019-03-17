@@ -72,8 +72,17 @@ def median_absolute_percentage_error(y_true, y_pred):
     return(output_errors)
 
 
-def plot_model_performance(y_pred, y_test, model_name):
+def plot_model_performance(y_pred, y_test, model_name, zoom = False):
     """Save a scatter plot of the predicted vs actuals."""
+
+    "zoom: If yes, zoom in on the part of the distribution where most data lie."
+
+    if (zoom == True):
+        axes_limit = 0.2 * 1e7
+        path_suffix = "_zoom"
+    else:
+        axes_limit = y_pred.max()*1.1
+        path_suffix = ""
 
     fig, ax = plt.subplots()
 
@@ -92,10 +101,10 @@ def plot_model_performance(y_pred, y_test, model_name):
     ax.set(title=subplot_title,
            xlabel='Actual selling price in $',
            ylabel='Predicted selling price in $',
-           xlim=(0, y_pred.max()*1.1),
-           ylim=(0, y_pred.max()*1.1)
+           xlim=(0, axes_limit),
+           ylim=(0, axes_limit)
     )
-    fig.savefig("./figures/model_performance_" + model_name + ".png", dpi=1000)
+    fig.savefig("./figures/model_performance_" + model_name + path_suffix + ".png", dpi=1000)
     plt.close(fig)
 
 # train-test split ------------------------------------------------------------
@@ -134,9 +143,9 @@ models.append((
         'RF',
          RandomForestRegressor(
                                random_state = random_seed),
-                               [{'ttregressor__regressor__max_features':[2,5,15,25],
-                                 "ttregressor__regressor__max_depth":[3, 9],
-                                 "ttregressor__regressor__n_estimators":[50, 500]}])
+                               [{'ttregressor__regressor__max_features': [5,15,25, 35],
+                                 "ttregressor__regressor__max_depth": [9],
+                                 "ttregressor__regressor__n_estimators": [500]}])
          )
 
 # Tune and evaluate models-----------------------------------------------------
@@ -180,6 +189,7 @@ for name, model, grid in models:
     msg_time = 'Tuning the ' + name + ' model took ' + str(round(t1 - t0, 2)) + ' seconds.'
     logging.info(msg_time)
     plot_model_performance(y_pred, y_test, name)
+    plot_model_performance(y_pred, y_test, name, zoom=True)
 
 # Models that are not tuned----------------------------------------------------
 
@@ -196,6 +206,7 @@ lin_reg = Pipeline([('scaling', StandardScaler()),
 lin_reg.fit(X_train, y_train)
 y_pred = lin_reg.predict(X_test)
 plot_model_performance(y_pred, y_test, "lin_reg")
+plot_model_performance(y_pred, y_test, "lin_reg", zoom=True)
 
 ## LGBM
 # create dataset for lightgbm using log-transform for selling price
@@ -235,8 +246,4 @@ logging.info("R2 score: " + str(round(r2_score(y_test, y_pred),3)))
 logging.info('MAE: ' + str(round(mean_absolute_error(y_test, y_pred), 2)))
 
 plot_model_performance(y_pred, y_test, "lgbm")
-
-
-# TO DO
-
-# Impute missing data
+plot_model_performance(y_pred, y_test, "lgbm", zoom=True)
