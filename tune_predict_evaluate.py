@@ -23,6 +23,7 @@ from sklearn.metrics import median_absolute_error
 from sklearn.compose import TransformedTargetRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+import lightgbm as lgb
 
 random_seed = 42
 
@@ -126,8 +127,8 @@ for name, model, grid in models:
               ])
     t0 = time.time()
     #print("# Tuning hyper-parameters for %s" % name)
-    logging.info("# Tuning hyper-parameters for %s" % name)
-    print()
+    logging.info("# Tuning hyper-parameters for %s---------------------" % name)
+    print("# Tuning hyper-parameters for %s" % name)
     current_model = GridSearchCV(my_pipeline, grid, cv=3,
                        scoring=scoring)
 
@@ -137,9 +138,7 @@ for name, model, grid in models:
 
     logging.info("Best parameters set found on train set:")
     logging.info(current_model.best_params_)
-    print()
     logging.info("Grid scores on train set:")
-    print()
     means = current_model.cv_results_['mean_test_score']
     stds = current_model.cv_results_['std_test_score']
     for mean, std, params in zip(means, stds, current_model.cv_results_['params']):
@@ -150,7 +149,6 @@ for name, model, grid in models:
     y_pred = current_model.predict(X_test)
     logging.info("R2 score: " + str(round(r2_score(y_test, y_pred),3)))
     logging.info('MAE: ' + str(round(mean_absolute_error(y_test, y_pred), 2)))
-    print()
     t1 = time.time()
     msg_time = 'Tuning the ' + name + ' model took ' + str(round(t1 - t0, 2)) + ' seconds.'
     logging.info(msg_time)
@@ -182,8 +180,70 @@ for i in range(len(tuned_models)):
            xlim=(0, y_pred.max()*1.1),
            ylim=(0, y_pred.max()*1.1)
     )
-    fig.savefig("./figures/model_performance" + tuned_models[i][0] + ".png", dpi=1000)
+    fig.savefig("./figures/model_performance_" + tuned_models[i][0] + ".png", dpi=1000)
     plt.close(fig)
+
+# create dataset for lightgbm
+lgb_train = lgb.Dataset(X_train, np.log(y_train))
+lgb_test = lgb.Dataset(X_test, np.log(y_test))
+
+
+# specify your configurations as a dict
+lgb_params = {
+    'task': 'train',
+    'objective': 'mae',
+    'boosting_type': 'gbdt',
+    'num_leaves': 100,
+    'learning_rate': 0.01,
+    'feature_fraction': 0.9,
+    'bagging_fraction': 0.8,
+    'bagging_freq': 5,
+    'verbose': 0,
+    'seed': 42
+}
+
+t0 = time.time()
+# train
+print("# Tuning hyper-parameters for LGBM")
+logging.info("# Tuning hyper-parameters for LGBM------------------------------")
+evals_result = {}  # to record eval results for plotting
+gbm = lgb.train(lgb_params,
+                lgb_train,
+                num_boost_round=1500,
+                #evals_result=evals_result,
+                #early_stopping_rounds=5
+                )
+t1 = time.time()
+msg_time = 'Tuning the Light GBM model took ' + str(round(t1 - t0, 2)) + ' seconds.'
+logging.info(msg_time)
+y_pred = np.exp(gbm.predict(X_test))
+logging.info("Score on the test set:")
+logging.info("R2 score: " + str(round(r2_score(y_test, y_pred),3)))
+logging.info('MAE: ' + str(round(mean_absolute_error(y_test, y_pred), 2)))
+
+fig, ax = plt.subplots()
+
+ax.scatter(y_test, y_pred, alpha=0.1)
+line = mlines.Line2D([0, 1], [0, 1], color='red')
+transform = ax.transAxes
+line.set_transform(transform)
+ax.add_line(line)
+subplot_title = "{} \n Median AE: {:.0f}, MAE: {:.0f}, \n Median APE: {:.3f}, MAPE: {:.3f}".format(
+            "LightGBM",
+            median_absolute_error(y_test, y_pred),
+            mean_absolute_error(y_test, y_pred),
+            median_absolute_percentage_error(y_test, y_pred),
+            mean_absolute_percentage_error(y_test, y_pred))
+    #ax[i].get_xaxis().get_major_formatter().set_scientific(False)
+ax.set(title=subplot_title,
+       xlabel='Actual selling price in $',
+       ylabel='Predicted selling price in $',
+       xlim=(0, y_pred.max()*1.1),
+       ylim=(0, y_pred.max()*1.1)
+)
+fig.savefig("./figures/model_performance_lgbm.png", dpi=1000)
+plt.close(fig)
+
 
 # TO DO
 
