@@ -127,7 +127,7 @@ models.append((
         'Lasso',
         ElasticNet(normalize=True, tol=0.1),
         [{'ttregressor__regressor__l1_ratio': [1],
-          'ttregressor__regressor__alpha': [1e-1, 1e-2, 1e-3, 1e-4]}]
+          'ttregressor__regressor__alpha': [1e-1, 5e-2, 1e-2, 5e-3, 1e-3]}]
         )
 )
 
@@ -135,18 +135,19 @@ models.append((
         'Ridge',
         ElasticNet(normalize=True, tol=0.1),
         [{'ttregressor__regressor__l1_ratio': [0],
-          'ttregressor__regressor__alpha': [1e-1, 1e-2, 1e-3, 1e-4]}]
+          'ttregressor__regressor__alpha': [5e-3, 1e-3, 5e-4, 1e-4]}]
         )
 )
 
 models.append((
-        'RF',
-         RandomForestRegressor(
-                               random_state = random_seed),
-                               [{'ttregressor__regressor__max_features': [5,15,25, 35],
-                                 "ttregressor__regressor__max_depth": [9],
-                                 "ttregressor__regressor__n_estimators": [500]}])
-         )
+    'RF',
+    RandomForestRegressor(random_state=random_seed),
+    [{
+        'ttregressor__regressor__max_features': [200, 300],
+        "ttregressor__regressor__max_depth": [15],
+        "ttregressor__regressor__n_estimators": [500]}]
+        )
+        )
 
 # Tune and evaluate models-----------------------------------------------------
 tuned_models = []

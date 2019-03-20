@@ -22,7 +22,9 @@ So far, the best results are attained by Gradient Boosting, with an Median absol
 
 ## To do
 
-* Extract and generated better features
-* Improve the tuning grids
+* Add in borroughs as feature
+* make nice exploratory plot
+* Tune LGM parameters
+* add in SVR
 
 The full code is located in the [pre_process file](pre_process.py) and the  [tune_predict_evaluate file](tune_predict_evaluate.py).
