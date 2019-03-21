@@ -123,7 +123,7 @@ keep_vars_one_hot_full = ["neighborhood",
                           "building_class_category",
                           # "zip_code",
                           "tax_class_at_time_of_sale",
-                          # "borough_name",
+                          "borough_name",
                           "sale_year",
                           "sale_month"
                           ]
