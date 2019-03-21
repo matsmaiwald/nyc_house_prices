@@ -22,7 +22,6 @@ So far, the best results are attained by Gradient Boosting, with an Median absol
 
 ## To do
 
-* Add in borroughs as feature
 * make nice exploratory plot
 * Tune LGM parameters
 * add in SVR
