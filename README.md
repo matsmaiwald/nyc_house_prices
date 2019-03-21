@@ -4,7 +4,7 @@
 In this project, I try to predict the price of houses sold in NYC in 2016 and 2017.
 
 ## Data
-The data is provided at and was downloaded from kaggle (https://www.kaggle.com/new-york-city/nyc-property-sales/version/1). The data on kaggle is a “concatenated and slightly cleaned-up version of the New York City Department of Finance’s Rolling Sales dataset”. Info on the variable definitions is available (https://www.kaggle.com/saswataroy09/new-york-house-price-prediction)
+The data is provided at and was downloaded from kaggle (https://www.kaggle.com/new-york-city/nyc-property-sales/version/1). The data on kaggle is a “concatenated and slightly cleaned-up version of the New York City Department of Finance’s Rolling Sales dataset”. Info on the variable definitions is available (https://www.kaggle.com/saswataroy09/new-york-house-price-prediction and https://www1.nyc.gov/assets/finance/downloads/pdf/07pdf/glossary_rsf071607.pdf)
 
 ## Methodology
 Using a 80-20 train-test split, I train different models on the training set, tune them via cross-validation and evaluate their predictive performance on the test set. The models used are:
