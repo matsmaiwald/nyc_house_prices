@@ -24,6 +24,8 @@ The best results are attained by the Light GBM version of Gradient Boosted Trees
 
 For the combined train and test sets, the selling price has a median of $630k and a standard deviation of $17,159k.
 
+[Detailed results](results.md)
+
 ![Results](/figures/model_performance_lgbm_zoom.png)
 
 ## To do
