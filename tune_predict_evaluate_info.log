@@ -1,4 +1,5 @@
 root - INFO - # Tuning hyper-parameters for Lasso---------------------
+root - INFO - # Tuning hyper-parameters for Lasso
 root - INFO - Best parameters set found on train set:
 root - INFO - {'ttregressor__regressor__alpha': 0.001, 'ttregressor__regressor__l1_ratio': 1}
 root - INFO - Grid scores on train set:
@@ -10,8 +11,9 @@ root - INFO - -1255156.911 (+/-500528.427) for {'ttregressor__regressor__alpha':
 root - INFO - Score on the test set:
 root - INFO - R2 score: 0.039
 root - INFO - MAE: 937320.71
-root - INFO - Tuning the Lasso model took 5.84 seconds.
+root - INFO - Tuning the Lasso model took 7.73 seconds.
 root - INFO - # Tuning hyper-parameters for Ridge---------------------
+root - INFO - # Tuning hyper-parameters for Ridge
 root - INFO - Best parameters set found on train set:
 root - INFO - {'ttregressor__regressor__alpha': 0.0005, 'ttregressor__regressor__l1_ratio': 0}
 root - INFO - Grid scores on train set:
@@ -22,8 +24,9 @@ root - INFO - -24821826.532 (+/-66548030.834) for {'ttregressor__regressor__alph
 root - INFO - Score on the test set:
 root - INFO - R2 score: 0.0
 root - INFO - MAE: 961896.12
-root - INFO - Tuning the Ridge model took 127.29 seconds.
+root - INFO - Tuning the Ridge model took 101.5 seconds.
 root - INFO - # Tuning hyper-parameters for RF---------------------
+root - INFO - # Tuning hyper-parameters for RF
 root - INFO - Best parameters set found on train set:
 root - INFO - {'ttregressor__regressor__max_depth': 15, 'ttregressor__regressor__max_features': 300, 'ttregressor__regressor__n_estimators': 500}
 root - INFO - Grid scores on train set:
@@ -32,9 +35,22 @@ root - INFO - -931689.533 (+/-440006.591) for {'ttregressor__regressor__max_dept
 root - INFO - Score on the test set:
 root - INFO - R2 score: 0.071
 root - INFO - MAE: 684292.11
-root - INFO - Tuning the RF model took 688.63 seconds.
+root - INFO - Tuning the RF model took 620.95 seconds.
+root - INFO - # Tuning hyper-parameters for GB_lad---------------------
+root - INFO - # Tuning hyper-parameters for GB_lad
+root - INFO - Best parameters set found on train set:
+root - INFO - {'ttregressor__regressor__max_features': 100}
+root - INFO - Grid scores on train set:
+root - INFO - -1092179.721 (+/-494710.508) for {'ttregressor__regressor__max_features': 10}
+root - INFO - -1066968.307 (+/-499478.971) for {'ttregressor__regressor__max_features': 50}
+root - INFO - -1065572.254 (+/-502074.642) for {'ttregressor__regressor__max_features': 100}
+root - INFO - Score on the test set:
+root - INFO - R2 score: 0.195
+root - INFO - MAE: 743354.36
+root - INFO - Tuning the GB_lad model took 351.75 seconds.
+root - INFO - # Tuning hyper-parameters for LGBM
 root - INFO - # Tuning hyper-parameters for LGBM-----------------------------
-root - INFO - Tuning the Light GBM model took 13.02 seconds.
+root - INFO - Tuning the Light GBMmodel took 13.58 seconds.
 root - INFO - Score on the test set:
 root - INFO - R2 score: 0.292
 root - INFO - MAE: 615101.24

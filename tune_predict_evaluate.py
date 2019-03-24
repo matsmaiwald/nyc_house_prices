@@ -99,8 +99,7 @@ def plot_model_performance(y_pred, y_test, model_name, zoom=False):
            xlabel='Actual selling price in $',
            ylabel='Predicted selling price in $',
            xlim=(0, axes_limit),
-           ylim=(0, axes_limit)
-    )
+           ylim=(0, axes_limit))
     fig.savefig("./figures/model_performance_" + model_name + path_suffix + ".png", dpi=1000)
     plt.close(fig)
 
@@ -155,15 +154,6 @@ models.append((
                                        ),
     [{'ttregressor__regressor__max_features': [10, 50, 100]}]
 ))
-models.append((
-    'GB_ls',
-    ensemble.GradientBoostingRegressor(random_state=random_seed,
-                                       loss='ls',
-                                       learning_rate=0.01,
-                                       n_estimators=1500
-                                       ),
-    [{'ttregressor__regressor__max_features': [10, 50, 100]}]
-))
 
 # Tune and evaluate models-----------------------------------------------------
 tuned_models = []
@@ -180,7 +170,7 @@ for name, model, grid in models:
               ])
     t0 = time.time()
     logging.info("# Tuning hyper-parameters for %s---------------------" % name)
-    print("# Tuning hyper-parameters for %s" % name)
+    logging.info("# Tuning hyper-parameters for %s" % name)
     current_model = GridSearchCV(my_pipeline,
                                  grid,
                                  cv=3,
@@ -190,16 +180,16 @@ for name, model, grid in models:
     current_model.fit(X_train, y_train)
     tuned_models.append((name, current_model.best_estimator_))
 
-    print("Best parameters set found on train set:")
-    print(current_model.best_params_)
-    print("Grid scores on train set:")
+    logging.info("Best parameters set found on train set:")
+    logging.info(current_model.best_params_)
+    logging.info("Grid scores on train set:")
     means = current_model.cv_results_['mean_test_score']
     stds = current_model.cv_results_['std_test_score']
     for mean, std, params in zip(
                                  means,
                                  stds,
                                  current_model.cv_results_['params']):
-        print("%0.3f (+/-%0.03f) for %r" % (mean, std * 2, params))
+        logging.info("%0.3f (+/-%0.03f) for %r" % (mean, std * 2, params))
 
     logging.info("Score on the test set:")
     y_pred = current_model.predict(X_test)
@@ -207,7 +197,7 @@ for name, model, grid in models:
     logging.info('MAE: ' + str(round(mean_absolute_error(y_test, y_pred), 2)))
     t1 = time.time()
     msg_time = 'Tuning the ' + name + ' model took ' + str(round(t1 - t0, 2)) + ' seconds.'
-    print(msg_time)
+    logging.info(msg_time)
     plot_model_performance(y_pred, y_test, name)
     plot_model_performance(y_pred, y_test, name, zoom=True)
 
@@ -248,7 +238,7 @@ lgb_params = {
 
 t0 = time.time()
 # train
-print("# Tuning hyper-parameters for LGBM")
+logging.info("# Tuning hyper-parameters for LGBM")
 logging.info("# Tuning hyper-parameters for LGBM-----------------------------")
 evals_result = {}  # to record eval results for plotting
 gbm = lgb.train(lgb_params,
