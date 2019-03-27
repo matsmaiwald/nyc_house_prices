@@ -26,6 +26,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 import lightgbm as lgb
 from sklearn import ensemble
+import seaborn as sns
 
 random_seed = 42
 
@@ -102,6 +103,28 @@ def plot_model_performance(y_pred, y_test, model_name, zoom=False):
            ylim=(0, axes_limit))
     fig.savefig("./figures/model_performance_" + model_name + path_suffix + ".png", dpi=1000)
     plt.close(fig)
+    
+def plot_model_performance_2(df, y_pred_col, y_test_col, model_name, zoom=False):
+    """Save a scatter plot of the predicted vs actuals."""
+
+    "zoom: If yes, zoom in on the part of the distribution where most data lie."
+
+    if (zoom == True):
+        axes_limit = 0.2 * 1e7
+        path_suffix = "_zoom"
+    else:
+        axes_limit = y_pred.max()*1.1
+        path_suffix = ""
+
+    fig, ax = plt.subplots()
+    sns.scatterplot(x=y_test_col, y=y_pred_col, data=df, ax=ax, alpha=0.1)
+    #ax.scatter(y_test, y_pred, alpha=0.1)
+    #line = mlines.Line2D([0, 1], [0, 1], color='red')
+    #transform = ax.transAxes
+    #line.set_transform(transform)
+    #ax.add_line(line)
+        #ax[i].get_xaxis().get_major_formatter().set_scientific(False)
+
 
 
 # train-test split ------------------------------------------------------------
@@ -198,8 +221,9 @@ for name, model, grid in models:
     t1 = time.time()
     msg_time = 'Tuning the ' + name + ' model took ' + str(round(t1 - t0, 2)) + ' seconds.'
     logging.info(msg_time)
-    plot_model_performance(y_pred, y_test, name)
-    plot_model_performance(y_pred, y_test, name, zoom=True)
+    df_plot = pd.concat([y_test.reset_index(), pd.Series(y_pred)], axis=1)
+    df_plot.columns = ['old_index', 'selling_price_actual', 'selling_price_pred']
+    plot_model_performance_2(y_pred_col='selling_price_pred', y_test_col="selling_price_actual", df=df_plot, model_name ='test')
 
 # Models that are not tuned----------------------------------------------------
 
