@@ -89,21 +89,26 @@ def plot_model_performance(y_pred, y_test, model_name, zoom=False):
     transform = ax.transAxes
     line.set_transform(transform)
     ax.add_line(line)
-    subplot_title = "{} \n Median AE: {:.0f}, MAE: {:.0f}, \n Median APE: {:.3f}, MAPE: {:.3f}".format(
+    subplot_title = '{} \n Median AE: {:.0f}, Median APE: {:.3f}'.format(
                 model_name,
                 median_absolute_error(y_test, y_pred),
-                mean_absolute_error(y_test, y_pred),
-                median_absolute_percentage_error(y_test, y_pred),
-                mean_absolute_percentage_error(y_test, y_pred))
+                median_absolute_percentage_error(y_test, y_pred)
+                )
         #ax[i].get_xaxis().get_major_formatter().set_scientific(False)
     ax.set(title=subplot_title,
            xlabel='Actual selling price in $',
            ylabel='Predicted selling price in $',
            xlim=(0, axes_limit),
            ylim=(0, axes_limit))
-    fig.savefig("./figures/model_performance_" + model_name + path_suffix + ".png", dpi=1000)
+    fig.savefig(
+        "./figures/model_performance_{}{}.png".format(
+            model_name,
+            path_suffix),
+        dpi=1000,
+        bbox_inches="tight"
+        )
     plt.close(fig)
-    
+
 def plot_model_performance_2(df, y_pred_col, y_test_col, model_name, zoom=False):
     """Save a scatter plot of the predicted vs actuals."""
 
@@ -118,6 +123,8 @@ def plot_model_performance_2(df, y_pred_col, y_test_col, model_name, zoom=False)
 
     fig, ax = plt.subplots()
     sns.scatterplot(x=y_test_col, y=y_pred_col, data=df, ax=ax, alpha=0.1)
+    fig.savefig("./figures/model_performance_" + model_name + path_suffix + "test" + ".png", dpi=1000, bbox_inches="tight")
+    plt.close(fig)
     #ax.scatter(y_test, y_pred, alpha=0.1)
     #line = mlines.Line2D([0, 1], [0, 1], color='red')
     #transform = ax.transAxes
@@ -224,6 +231,7 @@ for name, model, grid in models:
     df_plot = pd.concat([y_test.reset_index(), pd.Series(y_pred)], axis=1)
     df_plot.columns = ['old_index', 'selling_price_actual', 'selling_price_pred']
     plot_model_performance_2(y_pred_col='selling_price_pred', y_test_col="selling_price_actual", df=df_plot, model_name ='test')
+    plot_model_performance(y_pred=y_pred, y_test=y_test, model_name ='test', zoom=True)
 
 # Models that are not tuned----------------------------------------------------
 
