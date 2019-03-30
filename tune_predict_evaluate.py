@@ -211,7 +211,7 @@ for name, model, grid in models:
               )
               ])
     t0 = time.time()
-
+    print("# Tuning hyper-parameters for {}".format(name))
     current_model = GridSearchCV(my_pipeline,
                                  grid,
                                  cv=3,
@@ -233,6 +233,11 @@ for name, model, grid in models:
                            model_name=name,
                            zoom=True
                            )
+    plot_model_performance(y_pred=y_pred,
+                           y_test=y_test,
+                           model_name=name,
+                           zoom=False
+                           )
 
 # Models that are not tuned----------------------------------------------------
 
@@ -248,6 +253,7 @@ lin_reg = Pipeline([('scaling', StandardScaler()),
                     ])
 lin_reg.fit(X_train, y_train)
 y_pred = lin_reg.predict(X_test)
+log_end_of_model()
 plot_model_performance(y_pred, y_test, "lin_reg")
 plot_model_performance(y_pred, y_test, "lin_reg", zoom=True)
 
@@ -271,8 +277,7 @@ lgb_params = {
 
 t0 = time.time()
 # train
-logging.info("# Tuning hyper-parameters for LGBM")
-logging.info("# Tuning hyper-parameters for LGBM-----------------------------")
+print("# Tuning hyper-parameters for LGBM")
 evals_result = {}  # to record eval results for plotting
 gbm = lgb.train(lgb_params,
                 lgb_train,
