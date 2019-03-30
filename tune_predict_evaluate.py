@@ -74,9 +74,9 @@ def median_absolute_percentage_error(y_true, y_pred):
 def plot_model_performance(y_pred, y_test, model_name, zoom=False):
     """Save a scatter plot of the predicted vs actuals."""
 
-    "zoom: If yes, zoom in on the part of the distribution where most data lie."
+    "zoom: Zoom in on the part of the distribution where most data lie."
 
-    if (zoom == True):
+    if (zoom is True):
         axes_limit = 0.2 * 1e7
         path_suffix = "_zoom"
     else:
@@ -95,7 +95,6 @@ def plot_model_performance(y_pred, y_test, model_name, zoom=False):
                 median_absolute_error(y_test, y_pred),
                 median_absolute_percentage_error(y_test, y_pred)
                 )
-        #ax[i].get_xaxis().get_major_formatter().set_scientific(False)
     ax.set(title=subplot_title,
            xlabel='Actual selling price in $',
            ylabel='Predicted selling price in $',
@@ -116,30 +115,36 @@ def plot_model_performance(y_pred, y_test, model_name, zoom=False):
         )
     plt.close(fig)
 
-def plot_model_performance_2(df, y_pred_col, y_test_col, model_name, zoom=False):
-    """Save a scatter plot of the predicted vs actuals."""
 
-    "zoom: If yes, zoom in on the part of the distribution where most data lie."
+def log_train_set_info_and_performance(model, model_name):
+    """Log info on the tuning process and performance on train set."""
+    logging.info("# Tuning hyper-parameters for {}".format(model_name))
+    logging.info("Best parameters set found on train set:")
+    logging.info(model.best_params_)
+    logging.info("Grid scores on train set:")
 
-    if (zoom == True):
-        axes_limit = 0.2 * 1e7
-        path_suffix = "_zoom"
-    else:
-        axes_limit = y_pred.max()*1.1
-        path_suffix = ""
-
-    fig, ax = plt.subplots()
-    sns.scatterplot(x=y_test_col, y=y_pred_col, data=df, ax=ax, alpha=0.1)
-    fig.savefig("./figures/model_performance_" + model_name + path_suffix + "test" + ".png", dpi=1000, bbox_inches="tight")
-    plt.close(fig)
-    #ax.scatter(y_test, y_pred, alpha=0.1)
-    #line = mlines.Line2D([0, 1], [0, 1], color='red')
-    #transform = ax.transAxes
-    #line.set_transform(transform)
-    #ax.add_line(line)
-        #ax[i].get_xaxis().get_major_formatter().set_scientific(False)
+    means = model.cv_results_['mean_test_score']
+    stds = model.cv_results_['std_test_score']
+    for mean, std, params in zip(
+                                 means,
+                                 stds,
+                                 model.cv_results_['params']):
+        logging.info("%0.3f (+/-%0.03f) for %r" % (mean, std * 2, params))
 
 
+def log_test_set_performance(model_name, y_pred, y_test):
+    """Log performance on test set."""
+    logging.info("# Test set performance for {}".format(model_name))
+    logging.info("Score on the test set:")
+    logging.info("R2 score: " + str(round(r2_score(y_test, y_pred), 3)))
+    logging.info('MAE: ' + str(round(mean_absolute_error(y_test, y_pred), 2)))
+
+
+def log_end_of_model():
+    """Visually demarcate end of log info on a model."""
+    logging.info("")
+    logging.info("--------------------------------------")
+    logging.info("")
 
 # train-test split ------------------------------------------------------------
 
@@ -206,39 +211,28 @@ for name, model, grid in models:
               )
               ])
     t0 = time.time()
-    logging.info("# Tuning hyper-parameters for %s---------------------" % name)
-    logging.info("# Tuning hyper-parameters for %s" % name)
+
     current_model = GridSearchCV(my_pipeline,
                                  grid,
                                  cv=3,
                                  scoring=scoring
                                  )
-
     current_model.fit(X_train, y_train)
     tuned_models.append((name, current_model.best_estimator_))
-
-    logging.info("Best parameters set found on train set:")
-    logging.info(current_model.best_params_)
-    logging.info("Grid scores on train set:")
-    means = current_model.cv_results_['mean_test_score']
-    stds = current_model.cv_results_['std_test_score']
-    for mean, std, params in zip(
-                                 means,
-                                 stds,
-                                 current_model.cv_results_['params']):
-        logging.info("%0.3f (+/-%0.03f) for %r" % (mean, std * 2, params))
-
-    logging.info("Score on the test set:")
     y_pred = current_model.predict(X_test)
-    logging.info("R2 score: " + str(round(r2_score(y_test, y_pred), 3)))
-    logging.info('MAE: ' + str(round(mean_absolute_error(y_test, y_pred), 2)))
+
     t1 = time.time()
-    msg_time = 'Tuning the ' + name + ' model took ' + str(round(t1 - t0, 2)) + ' seconds.'
+
+    msg_time = 'Tuning the {} model took {:.2f} seconds'.format(name, t1 - t0)
     logging.info(msg_time)
-    df_plot = pd.concat([y_test.reset_index(), pd.Series(y_pred)], axis=1)
-    df_plot.columns = ['old_index', 'selling_price_actual', 'selling_price_pred']
-    plot_model_performance_2(y_pred_col='selling_price_pred', y_test_col="selling_price_actual", df=df_plot, model_name ='test')
-    plot_model_performance(y_pred=y_pred, y_test=y_test, model_name ='test', zoom=True)
+    log_train_set_info_and_performance(current_model, name)
+    log_test_set_performance(name, y_pred, y_test)
+    log_end_of_model()
+    plot_model_performance(y_pred=y_pred,
+                           y_test=y_test,
+                           model_name=name,
+                           zoom=True
+                           )
 
 # Models that are not tuned----------------------------------------------------
 
