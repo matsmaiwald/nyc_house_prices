@@ -12,6 +12,7 @@ import logging
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 import matplotlib.transforms as mtransforms
+import matplotlib.ticker
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import ElasticNet
@@ -100,6 +101,12 @@ def plot_model_performance(y_pred, y_test, model_name, zoom=False):
            ylabel='Predicted selling price in $',
            xlim=(0, axes_limit),
            ylim=(0, axes_limit))
+    ax.xaxis.set_major_locator(plt.MaxNLocator(5))
+    ax.yaxis.set_major_locator(plt.MaxNLocator(5))
+    ax.xaxis.set_major_formatter(
+        matplotlib.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
+    ax.yaxis.set_major_formatter(
+        matplotlib.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
     fig.savefig(
         "./figures/model_performance_{}{}.png".format(
             model_name,
