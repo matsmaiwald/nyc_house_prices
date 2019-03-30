@@ -12,27 +12,27 @@ borough_map = {1: "Manhattan",
                5: "Staten Island"
                }
 
-df_clean = pd.read_csv('./output/data_clean.csv')
+df_clean = pd.read_csv("./output/data_clean.csv")
 
 # Plotting distributions of Selling prices
-selling_price_pct_95 = np.percentile(df_clean['selling_price'], 95)
-plt.style.use('seaborn')
+selling_price_pct_95 = np.percentile(df_clean["selling_price"], 95)
+plt.style.use("seaborn")
 
 fig, ax = plt.subplots(1, 2)
 ax[0].hist(
         df_clean[
-            df_clean['selling_price'] < selling_price_pct_95
-            ]['selling_price'], bins=100)
+            df_clean["selling_price"] < selling_price_pct_95
+            ]["selling_price"], bins=100)
 ax[0].set(
-        title='Distribution of bottom 95% of selling prices',
-        xlabel='Selling price in $',
-        ylabel='Frequency'
+        title="Distribution of bottom 95% of selling prices",
+        xlabel="Selling price in $",
+        ylabel="Frequency"
         )
-ax[1].hist(df_clean['selling_price'].apply(np.log), bins=100)
+ax[1].hist(df_clean["selling_price"].apply(np.log), bins=100)
 ax[1].set(
-        title='Distribution of log-transformed selling price',
-        xlabel='Log(selling price) in $',
-        ylabel='Frequency'
+        title="Distribution of log-transformed selling price",
+        xlabel="Log(selling price) in $",
+        ylabel="Frequency"
         )
 fig.suptitle(
     "Selling prices are approximately log-normally distributed", size=16
@@ -46,15 +46,13 @@ plt.close(fig)
 
 cols = list(df_clean)
 # move the column to head of list using index, pop and insert
-cols.insert(0, cols.pop(cols.index('selling_price')))
+cols.insert(0, cols.pop(cols.index("selling_price")))
 df_clean = df_clean.loc[:, cols]
 corr = df_clean.corr()
 
-correlation = corr['selling_price'].sort_values(ascending=False)
+correlation = corr["selling_price"].sort_values(ascending=False)
 
 df_corr = df_clean[correlation.head(10).index]
-
-
 
 corr = df_corr.corr()
 
@@ -75,8 +73,6 @@ sns.heatmap(corr, mask=mask, cmap=cmap, vmax=.3, center=0,
 
 df_corr = df_clean[correlation.tail(10).index]
 
-
-
 corr = df_corr.corr()
 
 # Generate a mask for the upper triangle
@@ -93,8 +89,6 @@ cmap = sns.diverging_palette(220, 10, as_cmap=True)
 sns.heatmap(corr, mask=mask, cmap=cmap, vmax=.3, center=0,
             square=True, linewidths=.5, cbar_kws={"shrink": .5})
 
-
-
 # =============================================================================
 # fig, ax = plt.subplots(5)
 # fig.suptitle(
@@ -104,13 +98,13 @@ sns.heatmap(corr, mask=mask, cmap=cmap, vmax=.3, center=0,
 # for i in range(0, 5):
 #     ax[i].hist(
 #             df_clean[df_clean[  # borough_map starts at 1
-#                     'borough_name_' + borough_map[i+1]
-#                     ] == 1]['selling_price'].apply(np.log),
+#                     "borough_name_" + borough_map[i+1]
+#                     ] == 1]["selling_price"].apply(np.log),
 #             bins=100)
 #     ax[i].set(
 #             title=borough_map[i+1],
 #             xlabel="Log(selling price) in $",
-#             ylabel='Frequency',
+#             ylabel="Frequency",
 #             xlim=(10, 20)
 #             )
 #     # fig.tight_layout()

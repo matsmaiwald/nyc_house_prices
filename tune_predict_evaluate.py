@@ -1,4 +1,11 @@
-"""Tune models on train set and evaluate performance on test set."""
+"""Tune models on train set and evaluate performance on test set.
+
+This file performs some last steps of pre-processing (center and scale plus
+log-transform) and tunes a list of models on the nyc_house_prices train set.
+Lastly, it evaluates the performance of the tuned models on the test set.
+
+"""
+
 import logging
 import time
 
@@ -19,18 +26,20 @@ from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
+# Set random seed and logging for reproducibility
 random_seed = 42
 
 logging.basicConfig(
-    filename='./logs/tune_predict_evaluate_info.log',
-    filemode='w',
-    format='%(name)s - %(levelname)s - %(message)s',
+    filename="./logs/tune_predict_evaluate_info.log",
+    filemode="w",
+    format="%(name)s - %(levelname)s - %(message)s",
     level=logging.INFO)
 
 
+# Function definitions
 def mean_absolute_percentage_error(y_true, y_pred, sample_weight=None):
-    """Mean absolute percentage error regression loss.
-
+    """Mean absolute percentage error regression loss."""
+    """
     ----------
     y_true : array-like of shape = (n_samples) or (n_samples, n_outputs)
         Ground truth (correct) target values.
@@ -46,8 +55,8 @@ def mean_absolute_percentage_error(y_true, y_pred, sample_weight=None):
 
 
 def median_absolute_percentage_error(y_true, y_pred):
-    """Median absolute percentage error regression loss.
-
+    """Median absolute percentage error regression loss."""
+    """
     ----------
     y_true : array-like of shape = (n_samples) or (n_samples, n_outputs)
         Ground truth (correct) target values.
@@ -63,8 +72,7 @@ def median_absolute_percentage_error(y_true, y_pred):
 
 def plot_model_performance(y_pred, y_test, model_name, zoom=False):
     """Save a scatter plot of the predicted vs actuals."""
-
-    "zoom: Zoom in on the part of the distribution where most data lie."
+    """zoom: Zoom in on the part of the distribution where most data lie."""
 
     if (zoom is True):
         axes_limit = 0.2 * 1e7
@@ -76,26 +84,26 @@ def plot_model_performance(y_pred, y_test, model_name, zoom=False):
     fig, ax = plt.subplots()
 
     ax.scatter(y_test, y_pred, alpha=0.1)
-    line = mlines.Line2D([0, 1], [0, 1], color='red')
+    line = mlines.Line2D([0, 1], [0, 1], color="red")
     transform = ax.transAxes
     line.set_transform(transform)
     ax.add_line(line)
-    subplot_title = '{} \n Median AE: {:.0f}, Median APE: {:.3f}'.format(
+    subplot_title = "{} \n Median AE: {:.0f}, Median APE: {:.3f}".format(
                 model_name,
                 median_absolute_error(y_test, y_pred),
                 median_absolute_percentage_error(y_test, y_pred)
                 )
     ax.set(title=subplot_title,
-           xlabel='Actual selling price in $',
-           ylabel='Predicted selling price in $',
+           xlabel="Actual selling price in $",
+           ylabel="Predicted selling price in $",
            xlim=(0, axes_limit),
            ylim=(0, axes_limit))
     ax.xaxis.set_major_locator(plt.MaxNLocator(5))
     ax.yaxis.set_major_locator(plt.MaxNLocator(5))
     ax.xaxis.set_major_formatter(
-        matplotlib.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
+        matplotlib.ticker.FuncFormatter(lambda x, p: format(int(x), ",")))
     ax.yaxis.set_major_formatter(
-        matplotlib.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
+        matplotlib.ticker.FuncFormatter(lambda x, p: format(int(x), ",")))
     fig.savefig(
         "./figures/model_performance_{}{}.png".format(
             model_name,
@@ -113,12 +121,12 @@ def log_train_set_info_and_performance(model, model_name):
     logging.info(model.best_params_)
     logging.info("Grid scores on train set:")
 
-    means = model.cv_results_['mean_test_score']
-    stds = model.cv_results_['std_test_score']
+    means = model.cv_results_["mean_test_score"]
+    stds = model.cv_results_["std_test_score"]
     for mean, std, params in zip(
                                  means,
                                  stds,
-                                 model.cv_results_['params']):
+                                 model.cv_results_["params"]):
         logging.info("%0.3f (+/-%0.03f) for %r" % (mean, std * 2, params))
 
 
@@ -127,7 +135,7 @@ def log_test_set_performance(model_name, y_pred, y_test):
     logging.info("# Test set performance for {}".format(model_name))
     logging.info("Score on the test set:")
     logging.info("R2 score: " + str(round(r2_score(y_test, y_pred), 3)))
-    logging.info('MAE: ' + str(round(mean_absolute_error(y_test, y_pred), 2)))
+    logging.info("MAE: " + str(round(mean_absolute_error(y_test, y_pred), 2)))
 
 
 def log_end_of_model():
@@ -136,9 +144,9 @@ def log_end_of_model():
     logging.info("--------------------------------------")
     logging.info("")
 
-# train-test split ------------------------------------------------------------
 
-df_clean = pd.read_csv('./output/data_clean.csv')
+# train-test split ------------------------------------------------------------
+df_clean = pd.read_csv("./output/data_clean.csv")
 
 X = df_clean.drop(columns=["selling_price"])
 y = df_clean["selling_price"]
@@ -150,58 +158,58 @@ X_train, X_test, y_train, y_test = train_test_split(X,
                                                     )
 
 # Define models to be tuned----------------------------------------------------
-scoring = 'neg_mean_absolute_error'
+scoring = "neg_mean_absolute_error"
 models = []
 models.append((
-        'Lasso',
+        "Lasso",
         ElasticNet(normalize=True, tol=0.1),
-        [{'ttregressor__regressor__l1_ratio': [1],
-          'ttregressor__regressor__alpha': [1e-1, 5e-2, 1e-2, 5e-3, 1e-3]}]
+        [{"ttregressor__regressor__l1_ratio": [1],
+          "ttregressor__regressor__alpha": [1e-1, 5e-2, 1e-2, 5e-3, 1e-3]}]
         )
 )
-
 models.append((
-        'Ridge',
+        "Ridge",
         ElasticNet(normalize=True, tol=0.1),
-        [{'ttregressor__regressor__l1_ratio': [0],
-          'ttregressor__regressor__alpha': [5e-3, 1e-3, 5e-4, 1e-4]}]
+        [{"ttregressor__regressor__l1_ratio": [0],
+          "ttregressor__regressor__alpha": [5e-3, 1e-3, 5e-4, 1e-4]}]
         )
 )
-
 models.append((
-    'RF',
+    "RF",
     RandomForestRegressor(random_state=random_seed),
     [{
-        'ttregressor__regressor__max_features': [200, 300],
+        "ttregressor__regressor__max_features": [200, 300],
         "ttregressor__regressor__max_depth": [15],
         "ttregressor__regressor__n_estimators": [500]}]
         )
         )
 models.append((
-    'GB_lad',
+    "GB_lad",
     ensemble.GradientBoostingRegressor(random_state=random_seed,
-                                       loss='lad',
+                                       loss="lad",
                                        learning_rate=0.01,
                                        n_estimators=1500
                                        ),
-    [{'ttregressor__regressor__max_features': [10, 50, 100]}]
+    [{"ttregressor__regressor__max_features": [10, 50, 100]}]
 ))
 
 # Tune and evaluate models-----------------------------------------------------
 tuned_models = []
 for name, model, grid in models:
+    print("# Tuning hyper-parameters for {}".format(name))
+
+    t0 = time.time()
+
     my_pipeline = sk.pipeline.Pipeline([
-             ('scale', StandardScaler()),
-             ('ttregressor',
+             ("scale", StandardScaler()),
+             ("ttregressor",
               TransformedTargetRegressor(
                       regressor=model,
                       func=np.log,
                       inverse_func=np.exp
                       )
               )
-              ])
-    t0 = time.time()
-    print("# Tuning hyper-parameters for {}".format(name))
+    ])
     current_model = GridSearchCV(my_pipeline,
                                  grid,
                                  cv=3,
@@ -213,7 +221,8 @@ for name, model, grid in models:
 
     t1 = time.time()
 
-    msg_time = 'Tuning the {} model took {:.2f} seconds'.format(name, t1 - t0)
+    # Log and plot results of tuning
+    msg_time = "Tuning the {} model took {:.2f} seconds".format(name, t1 - t0)
     logging.info(msg_time)
     log_train_set_info_and_performance(current_model, name)
     log_test_set_performance(name, y_pred, y_test)
@@ -230,10 +239,9 @@ for name, model, grid in models:
                            )
 
 # Models that are not tuned----------------------------------------------------
-
 # Linear Regression
-lin_reg = Pipeline([('scaling', StandardScaler()),
-                    ('ttregressor',
+lin_reg = Pipeline([("scaling", StandardScaler()),
+                    ("ttregressor",
                      TransformedTargetRegressor(
                              regressor=LinearRegression(),
                              func=np.log,
@@ -253,20 +261,19 @@ lgb_train = lgb.Dataset(X_train, np.log(y_train))
 lgb_test = lgb.Dataset(X_test, np.log(y_test))
 
 lgb_params = {
-    'task': 'train',
-    'objective': 'mae',
-    'boosting_type': 'gbdt',
-    'num_leaves': 100,
-    'learning_rate': 0.01,
-    'feature_fraction': 0.9,
-    'bagging_fraction': 0.8,
-    'bagging_freq': 5,
-    'verbose': 0,
-    'seed': 42
+    "task": "train",
+    "objective": "mae",
+    "boosting_type": "gbdt",
+    "num_leaves": 100,
+    "learning_rate": 0.01,
+    "feature_fraction": 0.9,
+    "bagging_fraction": 0.8,
+    "bagging_freq": 5,
+    "verbose": 0,
+    "seed": 42
 }
 
 t0 = time.time()
-# train
 print("# Tuning hyper-parameters for LGBM")
 evals_result = {}  # to record eval results for plotting
 gbm = lgb.train(lgb_params,
@@ -276,15 +283,15 @@ gbm = lgb.train(lgb_params,
                 # early_stopping_rounds=5
                 )
 t1 = time.time()
-msg_time = ('Tuning the Light GBM' +
-            'model took {} seconds.'.format(str(round(t1 - t0, 2)))
+msg_time = ("Tuning the Light GBM" +
+            "model took {} seconds.".format(str(round(t1 - t0, 2)))
             )
 
 logging.info(msg_time)
 y_pred = np.exp(gbm.predict(X_test))
 logging.info("Score on the test set:")
 logging.info("R2 score: " + str(round(r2_score(y_test, y_pred), 3)))
-logging.info('MAE: ' + str(round(mean_absolute_error(y_test, y_pred), 2)))
+logging.info("MAE: " + str(round(mean_absolute_error(y_test, y_pred), 2)))
 
 plot_model_performance(y_pred, y_test, "lgbm")
 plot_model_performance(y_pred, y_test, "lgbm", zoom=True)
