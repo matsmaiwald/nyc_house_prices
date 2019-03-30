@@ -1,38 +1,28 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Mar 13 21:28:37 2019
-
-@author: Mats Ole
-"""
-import pandas as pd
-import numpy as np
-import sklearn as sk
-import time
+"""Tune models on train set and evaluate performance on test set."""
 import logging
-import matplotlib.pyplot as plt
-import matplotlib.lines as mlines
-import matplotlib.transforms as mtransforms
-import matplotlib.ticker
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.linear_model import ElasticNet
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import r2_score
-from sklearn.metrics import mean_absolute_error
-from sklearn.metrics import median_absolute_error
-from sklearn.compose import TransformedTargetRegressor
-from sklearn.pipeline import Pipeline
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
+import time
+
 import lightgbm as lgb
+import matplotlib.lines as mlines
+import matplotlib.pyplot as plt
+import matplotlib.ticker
+import numpy as np
+import pandas as pd
+import sklearn as sk
 from sklearn import ensemble
-import seaborn as sns
+from sklearn.compose import TransformedTargetRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import ElasticNet, LinearRegression
+from sklearn.metrics import (mean_absolute_error, median_absolute_error,
+                             r2_score)
+from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
 random_seed = 42
 
 logging.basicConfig(
-    filename='tune_predict_evaluate_info.log',
+    filename='./logs/tune_predict_evaluate_info.log',
     filemode='w',
     format='%(name)s - %(levelname)s - %(message)s',
     level=logging.INFO)

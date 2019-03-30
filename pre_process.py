@@ -6,8 +6,8 @@ tune_predic_evaluate.py script.
 
 Parameters
 ----------
-name_df_input : str
-    name of the raw data file.
+path_df_input : str
+    relative path to the raw data file.
 name_data_clean : str
     name under which the clean data is saved in the 'output' folder.
 pre_process_info.log : str
@@ -21,9 +21,9 @@ import pandas as pd
 # from sklearn.preprocessing import Imputer
 
 # Set parameters and logging configuration ------------------------------------
-name_df_input = "nyc-rolling-sales.csv"
+path_df_input = "./data_input/nyc-rolling-sales.csv"
 name_data_clean = 'data_clean.csv'
-name_log_file = 'pre_process_info.log'
+name_log_file = './logs/pre_process_info.log'
 
 logging.basicConfig(
     filename=name_log_file,
@@ -32,7 +32,7 @@ logging.basicConfig(
     level=logging.INFO)
 
 # Load and clean raw data -----------------------------------------------------
-df = pd.read_csv(name_df_input)
+df = pd.read_csv(path_df_input)
 
 # Remove blanks in column names.
 df.columns = map(str.lower, df.columns)
