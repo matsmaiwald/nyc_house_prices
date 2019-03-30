@@ -1,4 +1,4 @@
-root - INFO - Tuning the Lasso model took 6.14 seconds
+root - INFO - Tuning the Lasso model took 5.77 seconds
 root - INFO - # Tuning hyper-parameters for Lasso
 root - INFO - Best parameters set found on train set:
 root - INFO - {'ttregressor__regressor__alpha': 0.001, 'ttregressor__regressor__l1_ratio': 1}
@@ -15,7 +15,7 @@ root - INFO - MAE: 937320.71
 root - INFO - 
 root - INFO - --------------------------------------
 root - INFO - 
-root - INFO - Tuning the Ridge model took 124.30 seconds
+root - INFO - Tuning the Ridge model took 99.01 seconds
 root - INFO - # Tuning hyper-parameters for Ridge
 root - INFO - Best parameters set found on train set:
 root - INFO - {'ttregressor__regressor__alpha': 0.0005, 'ttregressor__regressor__l1_ratio': 0}
@@ -31,7 +31,7 @@ root - INFO - MAE: 961896.12
 root - INFO - 
 root - INFO - --------------------------------------
 root - INFO - 
-root - INFO - Tuning the RF model took 851.24 seconds
+root - INFO - Tuning the RF model took 574.20 seconds
 root - INFO - # Tuning hyper-parameters for RF
 root - INFO - Best parameters set found on train set:
 root - INFO - {'ttregressor__regressor__max_depth': 15, 'ttregressor__regressor__max_features': 300, 'ttregressor__regressor__n_estimators': 500}
@@ -45,7 +45,7 @@ root - INFO - MAE: 684292.11
 root - INFO - 
 root - INFO - --------------------------------------
 root - INFO - 
-root - INFO - Tuning the GB_lad model took 531.53 seconds
+root - INFO - Tuning the GB_lad model took 329.37 seconds
 root - INFO - # Tuning hyper-parameters for GB_lad
 root - INFO - Best parameters set found on train set:
 root - INFO - {'ttregressor__regressor__max_features': 100}
@@ -60,9 +60,10 @@ root - INFO - MAE: 743354.36
 root - INFO - 
 root - INFO - --------------------------------------
 root - INFO - 
-root - INFO - # Tuning hyper-parameters for LGBM
-root - INFO - # Tuning hyper-parameters for LGBM-----------------------------
-root - INFO - Tuning the Light GBMmodel took 15.42 seconds.
+root - INFO - 
+root - INFO - --------------------------------------
+root - INFO - 
+root - INFO - Tuning the Light GBMmodel took 12.28 seconds.
 root - INFO - Score on the test set:
 root - INFO - R2 score: 0.292
 root - INFO - MAE: 615101.24
